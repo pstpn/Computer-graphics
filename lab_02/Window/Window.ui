@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1395</width>
+    <height>898</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 13pt &quot;URW Gothic&quot;;</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QPushButton" name="ExecTrans">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>690</y>
+      <width>411</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Выполнить преобразования</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="MainField">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>90</y>
+      <width>900</width>
+      <height>720</height>
+     </rect>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>900</width>
+      <height>720</height>
+     </size>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ClearGraph">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>291</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Очистить граф. поле</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="DrawInitFigure">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>10</y>
+      <width>411</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Изобразить исходную фигуру</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ClearAllFields">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>10</y>
+      <width>291</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Очистить поля</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="RotateField">
+    <property name="geometry">
+     <rect>
+      <x>940</x>
+      <y>460</y>
+      <width>441</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="placeholderText">
+     <string>Значение в градусах</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="OffsetXField">
+    <property name="geometry">
+     <rect>
+      <x>940</x>
+      <y>330</y>
+      <width>211</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="placeholderText">
+     <string>По оси Ox</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="CenterXField">
+    <property name="geometry">
+     <rect>
+      <x>940</x>
+      <y>180</y>
+      <width>211</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="placeholderText">
+     <string>x</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>940</x>
+      <y>130</y>
+      <width>441</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Координаты центра масштабирования / поворота:</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ReturnToPrev">
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>10</y>
+      <width>291</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Вернуться к предыдущему
+изображению</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>940</x>
+      <y>280</y>
+      <width>441</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Смещение по оси Ox и оси Oy:</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="CenterYField">
+    <property name="geometry">
+     <rect>
+      <x>1160</x>
+      <y>180</y>
+      <width>221</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="placeholderText">
+     <string>y</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="OffsetYField">
+    <property name="geometry">
+     <rect>
+      <x>1160</x>
+      <y>330</y>
+      <width>221</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="placeholderText">
+     <string>По оси Oy</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>940</x>
+      <y>410</y>
+      <width>441</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Угол поворота фигуры относительно центра:</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="ScalingField">
+    <property name="geometry">
+     <rect>
+      <x>940</x>
+      <y>590</y>
+      <width>441</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="placeholderText">
+     <string>Действительное число</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>940</x>
+      <y>540</y>
+      <width>441</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Коэффициент масштабирования:</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1395</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>Выход</string>
+    </property>
+    <addaction name="Quit"/>
+   </widget>
+   <addaction name="menu_2"/>
+  </widget>
+  <action name="ClearAll">
+   <property name="text">
+    <string>Очистить все поля</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>URW Bookman</family>
+     <weight>75</weight>
+     <italic>false</italic>
+     <bold>true</bold>
+    </font>
+   </property>
+  </action>
+  <action name="Quit">
+   <property name="text">
+    <string>Выход</string>
+   </property>
+  </action>
+  <action name="ClearAll_2">
+   <property name="text">
+    <string>Очистить все</string>
+   </property>
+  </action>
+  <action name="Finding">
+   <property name="text">
+    <string>Найти четырехугольники</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
