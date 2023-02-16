@@ -37,20 +37,35 @@ font: 63 14pt &quot;URW Gothic&quot;;</string>
      <string>Выполнить преобразования</string>
     </property>
    </widget>
-   <widget class="QLabel" name="MainField">
+   <widget class="QLabel" name="GraphField">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>90</y>
+      <x>20</x>
+      <y>110</y>
       <width>900</width>
       <height>720</height>
      </rect>
     </property>
+    <property name="minimumSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
     <property name="maximumSize">
      <size>
-      <width>900</width>
-      <height>720</height>
+      <width>16777215</width>
+      <height>16777215</height>
      </size>
+    </property>
+    <property name="acceptDrops">
+     <bool>false</bool>
+    </property>
+    <property name="toolTip">
+     <string/>
     </property>
     <property name="text">
      <string/>

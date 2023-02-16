@@ -1,9 +1,37 @@
+import math
+
 from PyQt5 import QtWidgets, QtCore, QtGui, uic
 import sys
 
 
 # Default coordinates
-default_coordinates = [(0, 0), (100, 0), (100, 100), (0, 100)]
+default_coordinates = {
+    "circle": {
+        "center": [400, 310],
+        "radius": 100
+    },
+    "line": {
+        "first_point": [350, 410],
+        "second_point": [550, 410]
+    },
+    "ellipse": {
+        "center": [350, 360],
+        "radius_x": 200,
+        "radius_y": 100
+    },
+    "left_quad": {
+        "first_side": {
+            "first_point": [350, 410],
+            "second_point": [450, 276]
+        }
+    },
+    "right_quad": {
+        "first_side": {
+            "first_point": [550, 410],
+            "second_point": [450, 276]
+        }
+    }
+}
 
 # Colors code: green, red, blue, purple, yellow
 colors = ["#00FF00", "#FF0000", "#0000FF", "#800080", "#FFFF00"]
@@ -25,6 +53,13 @@ def ErrorDialog(info):
     msg.exec_()
 
 
+def RotatePoint(center, point, angle):
+    return [int(center[0] + (point[0] - center[0]) * math.cos(math.radians(angle)) + (point[1] - center[1]) *
+                math.sin(math.radians(angle))),
+            int(center[1] - (point[0] - center[0]) * math.sin(math.radians(angle)) + (point[1] - center[1]) *
+                math.cos(math.radians(angle)))]
+
+
 class Window(QtWidgets.QMainWindow):
     def __init__(self):
 
@@ -34,12 +69,12 @@ class Window(QtWidgets.QMainWindow):
         uic.loadUi('Window/Window.ui', self)
 
         # Set the main field
-        self.SetMainField()
+        self.SetGraphField()
 
         # Set the buttons
         self.ClearAllFields.setShortcut("Ctrl+W")
         self.ClearAllFields.clicked.connect(lambda clear_all: self.DeleteAllFieldsData())
-        self.ExecTrans.clicked.connect(lambda draw_figure: self.DrawFigure())
+        self.ExecTrans.clicked.connect(lambda draw_figure: self.InitDrawFigure())
         self.ClearGraph.clicked.connect(lambda delete_graph: self.DeleteGraph())
 
         # Set the quit trigger
@@ -47,40 +82,116 @@ class Window(QtWidgets.QMainWindow):
         self.Quit.triggered.connect(lambda close_app: QtWidgets.qApp.quit())
 
         # Coordinates of figures
-        self.coordinates, self.last_coordinates = [], []
+        self.coordinates, self.last_coordinates = {}, {}
 
-    def SetMainField(self):
+    def SetGraphField(self):
 
         canvas = QtGui.QPixmap(900, 720)
-        self.MainField.setPixmap(canvas)
+        self.GraphField.setPixmap(canvas)
 
-    def DrawFigure(self):
+    def InitDrawFigure(self):
 
-        # Check if the coordinates
         if not self.coordinates:
             self.coordinates = default_coordinates
 
         # Draw the figure
-        for i in range(len(self.coordinates) - 1):
-            self.DrawLine(colors[i], self.coordinates[i], self.coordinates[i + 1])
+        self.DrawCircle(colors[0], self.coordinates["circle"]["center"], self.coordinates["circle"]["radius"])
+        self.DrawLine(colors[1], self.coordinates["line"]["first_point"], self.coordinates["line"]["second_point"])
+        self.DrawHalfEllipse(colors[2], self.coordinates["ellipse"]["center"], self.coordinates["ellipse"]["radius_x"],
+                             self.coordinates["ellipse"]["radius_y"])
 
-        # Draw the last line
-        self.DrawLine(colors[4], self.coordinates[-1], self.coordinates[0])
+        self.DrawLine(colors[3], self.coordinates["left_quad"]["first_side"]["first_point"],
+                      self.coordinates["left_quad"]["first_side"]["second_point"])
+
+        self.DrawLine(colors[3],
+                      self.coordinates["left_quad"]["first_side"]["second_point"],
+                      RotatePoint(self.coordinates["left_quad"]["first_side"]["second_point"],
+                                  self.coordinates["left_quad"]["first_side"]["first_point"],
+                                  -90))
+
+        self.DrawLine(colors[3],
+                      self.coordinates["left_quad"]["first_side"]["first_point"],
+                      RotatePoint(self.coordinates["left_quad"]["first_side"]["first_point"],
+                                  self.coordinates["left_quad"]["first_side"]["second_point"],
+                                  90))
+
+        self.DrawLine(colors[3],
+                      RotatePoint(self.coordinates["left_quad"]["first_side"]["first_point"],
+                                  self.coordinates["left_quad"]["first_side"]["second_point"],
+                                  90),
+                      RotatePoint(self.coordinates["left_quad"]["first_side"]["second_point"],
+                                  self.coordinates["left_quad"]["first_side"]["first_point"],
+                                  -90))
+
+        self.DrawLine(colors[3], self.coordinates["right_quad"]["first_side"]["first_point"],
+                      self.coordinates["right_quad"]["first_side"]["second_point"])
+
+        self.DrawLine(colors[3],
+                      self.coordinates["right_quad"]["first_side"]["second_point"],
+                      RotatePoint(self.coordinates["right_quad"]["first_side"]["second_point"],
+                                  self.coordinates["right_quad"]["first_side"]["first_point"],
+                                  90))
+
+        self.DrawLine(colors[3],
+                      self.coordinates["right_quad"]["first_side"]["first_point"],
+                      RotatePoint(self.coordinates["right_quad"]["first_side"]["first_point"],
+                                  self.coordinates["right_quad"]["first_side"]["second_point"],
+                                  -90))
+
+        self.DrawLine(colors[3],
+                      RotatePoint(self.coordinates["right_quad"]["first_side"]["first_point"],
+                                  self.coordinates["right_quad"]["first_side"]["second_point"],
+                                  -90),
+                      RotatePoint(self.coordinates["right_quad"]["first_side"]["second_point"],
+                                  self.coordinates["right_quad"]["first_side"]["first_point"],
+                                  90))
 
     def DrawLine(self, color, first_point, second_point):
 
         # Set the painter
-        painter = QtGui.QPainter(self.MainField.pixmap())
+        painter = QtGui.QPainter(self.GraphField.pixmap())
         pen = QtGui.QPen()
-        pen.setWidth(5)
+        pen.setWidth(2)
         pen.setColor(QtGui.QColor(color))
         painter.setPen(pen)
 
-        # Draw the first point
+        # Draw the line
         painter.drawLine(first_point[0], first_point[1], second_point[0], second_point[1])
 
         # Update the field
-        self.MainField.update()
+        self.GraphField.update()
+        painter.end()
+
+    def DrawCircle(self, color, center, radius):
+
+        # Set the painter
+        painter = QtGui.QPainter(self.GraphField.pixmap())
+        pen = QtGui.QPen()
+        pen.setWidth(2)
+        pen.setColor(QtGui.QColor(color))
+        painter.setPen(pen)
+
+        # Draw the circle
+        painter.drawEllipse(center[0], center[1], radius, radius)
+
+        # Update the field
+        self.GraphField.update()
+        painter.end()
+
+    def DrawHalfEllipse(self, color, center, radius_x, radius_y):
+
+        # Set the painter
+        painter = QtGui.QPainter(self.GraphField.pixmap())
+        pen = QtGui.QPen()
+        pen.setWidth(2)
+        pen.setColor(QtGui.QColor(color))
+        painter.setPen(pen)
+
+        # Draw the half ellipse
+        painter.drawArc(center[0], center[1], radius_x, radius_y, 0, -180 * 16)
+
+        # Update the field
+        self.GraphField.update()
         painter.end()
 
     def DeleteAllFieldsData(self):
@@ -102,8 +213,8 @@ class Window(QtWidgets.QMainWindow):
     def DeleteGraph(self):
 
         # Clear the graph
-        self.MainField.pixmap().fill(QtCore.Qt.black)
-        self.MainField.update()
+        self.GraphField.pixmap().fill(QtCore.Qt.black)
+        self.GraphField.update()
 
         # Save coordinates
         self.last_coordinates = self.coordinates
