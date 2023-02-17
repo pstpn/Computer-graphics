@@ -37,16 +37,16 @@ default_coordinates = {
 colors = ["#00FF00", "#FF0000", "#0000FF", "#800080", "#FFFF00"]
 
 
-def ErrorDialog(info):
+def ErrorDialog(title, name, info):
 
     # Create a message box
     msg = QtWidgets.QMessageBox()
     msg.setIcon(QtWidgets.QMessageBox.Information)
 
     # Set the message box text
-    msg.setText("Ошибка")
+    msg.setText(name)
     msg.setInformativeText(info)
-    msg.setWindowTitle("Error")
+    msg.setWindowTitle(title)
     msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
 
     # Show the message box
@@ -74,15 +74,18 @@ class Window(QtWidgets.QMainWindow):
         # Set the buttons
         self.ClearAllFields.setShortcut("Ctrl+W")
         self.ClearAllFields.clicked.connect(lambda clear_all: self.DeleteAllFieldsData())
-        self.ExecTrans.clicked.connect(lambda draw_figure: self.InitDrawFigure())
+        self.ExecTrans.clicked.connect(lambda draw_figure: self.ExecTransFigure())
+        self.DrawInitFigure.clicked.connect(lambda draw_figure: self.InitDrawFigure())
         self.ClearGraph.clicked.connect(lambda delete_graph: self.DeleteGraph())
+        self.ReturnToPrev.setShortcut("Ctrl+Z")
+        self.ReturnToPrev.clicked.connect(lambda go_back: self.GoBack())
 
         # Set the quit trigger
         self.Quit.setShortcut("Ctrl+D")
         self.Quit.triggered.connect(lambda close_app: QtWidgets.qApp.quit())
 
         # Coordinates of figures
-        self.coordinates, self.last_coordinates = {}, {}
+        self.coordinates, self.last_coordinates = {}, []
 
     def SetGraphField(self):
 
@@ -91,16 +94,34 @@ class Window(QtWidgets.QMainWindow):
 
     def InitDrawFigure(self):
 
+        # Save coordinates
+        self.last_coordinates.append(self.coordinates)
+        self.coordinates = default_coordinates
+
+        # Draw figure
+        self.DrawFigure()
+
+    def DrawFigure(self):
+
         if not self.coordinates:
             self.coordinates = default_coordinates
 
         # Draw the figure
-        self.DrawCircle(colors[0], self.coordinates["circle"]["center"], self.coordinates["circle"]["radius"])
-        self.DrawLine(colors[1], self.coordinates["line"]["first_point"], self.coordinates["line"]["second_point"])
-        self.DrawHalfEllipse(colors[2], self.coordinates["ellipse"]["center"], self.coordinates["ellipse"]["radius_x"],
+        self.DrawCircle(colors[0],
+                        self.coordinates["circle"]["center"],
+                        self.coordinates["circle"]["radius"])
+
+        self.DrawLine(colors[1],
+                      self.coordinates["line"]["first_point"],
+                      self.coordinates["line"]["second_point"])
+
+        self.DrawHalfEllipse(colors[2],
+                             self.coordinates["ellipse"]["center"],
+                             self.coordinates["ellipse"]["radius_x"],
                              self.coordinates["ellipse"]["radius_y"])
 
-        self.DrawLine(colors[3], self.coordinates["left_quad"]["first_side"]["first_point"],
+        self.DrawLine(colors[3],
+                      self.coordinates["left_quad"]["first_side"]["first_point"],
                       self.coordinates["left_quad"]["first_side"]["second_point"])
 
         self.DrawLine(colors[3],
@@ -123,7 +144,8 @@ class Window(QtWidgets.QMainWindow):
                                   self.coordinates["left_quad"]["first_side"]["first_point"],
                                   -90))
 
-        self.DrawLine(colors[3], self.coordinates["right_quad"]["first_side"]["first_point"],
+        self.DrawLine(colors[3],
+                      self.coordinates["right_quad"]["first_side"]["first_point"],
                       self.coordinates["right_quad"]["first_side"]["second_point"])
 
         self.DrawLine(colors[3],
@@ -145,6 +167,44 @@ class Window(QtWidgets.QMainWindow):
                       RotatePoint(self.coordinates["right_quad"]["first_side"]["second_point"],
                                   self.coordinates["right_quad"]["first_side"]["first_point"],
                                   90))
+
+    def GetXYParams(self, func_x, func_y):
+
+        tmp_x = func_x()
+        tmp_y = func_y()
+
+        if tmp_y == tmp_x == "":
+            return [], None
+
+        x, y = float(), float()
+
+        # Get coordinates
+        try:
+            x, y = float(tmp_x), float(tmp_y)
+        except ValueError:
+            ErrorDialog("Ошибка получения координат",
+                        "Координаты центра масштабирования/поворота заданы некорректно",
+                        "Ожидались целые величины\n(заданы символьные значения)")
+
+            return [], ValueError
+
+        if int(x) != x or int(y) != y:
+            ErrorDialog("Ошибка получения координат",
+                        "Координаты центра масштабирования/поворота заданы некорректно",
+                        "Ожидались целые величины\n(заданы вещественные значения)")
+
+            return [], ValueError
+
+        return [int(x), int(y)], None
+
+    def ExecTransFigure(self):
+
+        # Get shift
+        shift, err = self.GetXYParams(self.OffsetXField.toPlainText, self.OffsetYField.toPlainText)
+        if err == ValueError:
+            return
+        elif len(shift) == 0:
+            print("Skip")
 
     def DrawLine(self, color, first_point, second_point):
 
@@ -193,6 +253,17 @@ class Window(QtWidgets.QMainWindow):
         # Update the field
         self.GraphField.update()
         painter.end()
+
+    def GoBack(self):
+
+        # Get prev coordinates
+        try:
+            self.coordinates = self.last_coordinates.pop()
+        except IndexError:
+            self.coordinates = default_coordinates
+
+        # Draw figure
+        self.DrawFigure()
 
     def DeleteAllFieldsData(self):
 
