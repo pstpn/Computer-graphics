@@ -168,6 +168,31 @@ class Window(QtWidgets.QMainWindow):
                                   self.coordinates["right_quad"]["first_side"]["first_point"],
                                   90))
 
+    def TransferFigure(self, shift):
+
+        self.last_coordinates.append(self.coordinates)
+
+        self.coordinates["circle"]["center"][0] += shift[0]
+        self.coordinates["circle"]["center"][1] -= shift[1]
+
+        self.coordinates["line"]["first_point"][0] += shift[0]
+        self.coordinates["line"]["first_point"][1] -= shift[1]
+        self.coordinates["line"]["second_point"][0] += shift[0]
+        self.coordinates["line"]["second_point"][1] -= shift[1]
+
+        self.coordinates["ellipse"]["center"][0] += shift[0]
+        self.coordinates["ellipse"]["center"][1] -= shift[1]
+
+        self.coordinates["left_quad"]["first_side"]["first_point"][0] += shift[0]
+        self.coordinates["left_quad"]["first_side"]["first_point"][1] -= shift[1]
+        self.coordinates["left_quad"]["first_side"]["second_point"][0] += shift[0]
+        self.coordinates["left_quad"]["first_side"]["second_point"][1] -= shift[1]
+
+        self.coordinates["right_quad"]["first_side"]["first_point"][0] += shift[0]
+        self.coordinates["right_quad"]["first_side"]["first_point"][1] -= shift[1]
+        self.coordinates["right_quad"]["first_side"]["second_point"][0] += shift[0]
+        self.coordinates["right_quad"]["first_side"]["second_point"][1] -= shift[1]
+
     def GetXYParams(self, func_x, func_y):
 
         tmp_x = func_x()
@@ -203,8 +228,11 @@ class Window(QtWidgets.QMainWindow):
         shift, err = self.GetXYParams(self.OffsetXField.toPlainText, self.OffsetYField.toPlainText)
         if err == ValueError:
             return
-        elif len(shift) == 0:
-            print("Skip")
+
+        if len(shift) != 0:
+            self.TransferFigure(shift)
+
+         # После всех преобразований вывод итоговых координат и добавление последних координат
 
     def DrawLine(self, color, first_point, second_point):
 
@@ -262,6 +290,9 @@ class Window(QtWidgets.QMainWindow):
         except IndexError:
             self.coordinates = default_coordinates
 
+        # Clear graph
+        self.DeleteGraph()
+
         # Draw figure
         self.DrawFigure()
 
@@ -288,10 +319,10 @@ class Window(QtWidgets.QMainWindow):
         self.GraphField.update()
 
         # Save coordinates
-        self.last_coordinates = self.coordinates
+        self.last_coordinates.append(self.coordinates)
 
         # Clear coordinates
-        self.coordinates = []
+        self.coordinates = {}
 
 
 if __name__ == "__main__":
