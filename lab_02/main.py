@@ -1,14 +1,15 @@
 import math
+from decimal import Decimal
 
 from PyQt5 import QtWidgets, QtCore, QtGui, uic
 import sys
 
-
 # Default coordinates
 default_coordinates = {
     "circle": {
-        "center": [400, 310],
-        "radius": 100
+        "first_point": [450, 410],
+        "second_point": [410, 330],
+        "third_point": [490, 330],
     },
     "line": {
         "first_point": [350, 410],
@@ -22,13 +23,13 @@ default_coordinates = {
     "left_quad": {
         "first_side": {
             "first_point": [350, 410],
-            "second_point": [450, 276]
+            "second_point": [450, 277]
         }
     },
     "right_quad": {
         "first_side": {
             "first_point": [550, 410],
-            "second_point": [450, 276]
+            "second_point": [450, 277]
         }
     }
 }
@@ -54,10 +55,69 @@ def ErrorDialog(title, name, info):
 
 
 def RotatePoint(center, point, angle):
-    return [int(center[0] + (point[0] - center[0]) * math.cos(math.radians(angle)) + (point[1] - center[1]) *
-                math.sin(math.radians(angle))),
-            int(center[1] - (point[0] - center[0]) * math.sin(math.radians(angle)) + (point[1] - center[1]) *
-                math.cos(math.radians(angle)))]
+
+    return [int((Decimal(center[0] + (point[0] - center[0]) * Decimal(math.cos(math.radians(angle)))) + Decimal((point[1] - center[1])) *
+                Decimal(math.sin(math.radians(angle))))),
+            int((Decimal(center[1] - (point[0] - center[0]) * Decimal(math.sin(math.radians(angle)))) + Decimal((point[1] - center[1])) *
+                Decimal(math.cos(math.radians(angle)))))]
+
+
+def GetXYParams(func_x, func_y):
+
+    tmp_x = func_x()
+    tmp_y = func_y()
+
+    if tmp_y == tmp_x == "":
+        return [], None
+
+    # Get coordinates
+    try:
+        x, y = float(tmp_x), float(tmp_y)
+    except ValueError:
+        ErrorDialog("Ошибка получения координат",
+                    "Координаты заданы некорректно",
+                    "Ожидались целые величины\n(заданы символьные значения)")
+
+        return [], ValueError
+
+    if int(x) != x or int(y) != y:
+        ErrorDialog("Ошибка получения координат",
+                    "Координаты заданы некорректно",
+                    "Ожидались целые величины\n(заданы вещественные значения)")
+
+        return [], ValueError
+
+    return [int(x), int(y)], None
+
+
+def GetCircleCenter(first_point, second_point, third_point):
+
+    x1, y1 = first_point
+    x2, y2 = second_point
+    x3, y3 = third_point
+
+    if x3 == x2 or x2 == x1:
+        x2 += 1e-11
+
+    m1 = (Decimal((y2 - y1))) / (Decimal((x2 - x1)))
+    m2 = (Decimal((y3 - y2))) / (Decimal((x3 - x2)))
+
+    if m1 == 0 or m1 == m2:
+        m1 += Decimal(1e-11)
+
+    xc = (Decimal((m1 * m2 * (y1 - y3) + m2 * (x1 + x2) - m1 * (x2 + x3)))) / (Decimal(2 * (m2 - m1)))
+    yc = (Decimal(-1 / m1)) * (Decimal(xc - Decimal(Decimal((x1 + x2)) / 2))) + Decimal(Decimal((y1 + y2)) / 2)
+
+    return [int(xc - 50), int(yc - 50)]
+
+
+def GetCircleRadius(first_point, second_point, third_point, center):
+
+    r1 = Decimal(math.sqrt(Decimal((first_point[0] - center[0]) ** 2) + Decimal((first_point[1] - center[1]) ** 2)))
+    r2 = Decimal(math.sqrt(Decimal((second_point[0] - center[0]) ** 2) + Decimal((second_point[1] - center[1]) ** 2)))
+    r3 = Decimal(math.sqrt(Decimal((third_point[0] - center[0]) ** 2) + Decimal((third_point[1] - center[1]) ** 2)))
+
+    return int(max(r1, r2, r3))
 
 
 class Window(QtWidgets.QMainWindow):
@@ -73,16 +133,16 @@ class Window(QtWidgets.QMainWindow):
 
         # Set the buttons
         self.ClearAllFields.setShortcut("Ctrl+W")
-        self.ClearAllFields.clicked.connect(lambda clear_all: self.DeleteAllFieldsData())
-        self.ExecTrans.clicked.connect(lambda draw_figure: self.ExecTransFigure())
-        self.DrawInitFigure.clicked.connect(lambda draw_figure: self.InitDrawFigure())
-        self.ClearGraph.clicked.connect(lambda delete_graph: self.DeleteGraph())
+        self.ClearAllFields.clicked.connect(self.DeleteAllFieldsData)
+        self.ExecTrans.clicked.connect(self.ExecTransFigure)
+        self.DrawInitFigure.clicked.connect(self.InitDrawFigure)
+        self.ClearGraph.clicked.connect(self.DeleteGraph)
         self.ReturnToPrev.setShortcut("Ctrl+Z")
-        self.ReturnToPrev.clicked.connect(lambda go_back: self.GoBack())
+        self.ReturnToPrev.clicked.connect(self.GoBack)
 
         # Set the quit trigger
         self.Quit.setShortcut("Ctrl+D")
-        self.Quit.triggered.connect(lambda close_app: QtWidgets.qApp.quit())
+        self.Quit.triggered.connect(QtWidgets.qApp.quit)
 
         # Coordinates of figures
         self.coordinates, self.last_coordinates = {}, []
@@ -95,7 +155,9 @@ class Window(QtWidgets.QMainWindow):
     def InitDrawFigure(self):
 
         # Save coordinates
-        self.last_coordinates.append(self.coordinates)
+        if len(self.last_coordinates) != 0:
+            self.last_coordinates.append(self.coordinates)
+
         self.coordinates = default_coordinates
 
         # Draw figure
@@ -103,13 +165,11 @@ class Window(QtWidgets.QMainWindow):
 
     def DrawFigure(self):
 
-        if not self.coordinates:
-            self.coordinates = default_coordinates
+        if len(self.coordinates) == 0:
+            return
 
         # Draw the figure
-        self.DrawCircle(colors[0],
-                        self.coordinates["circle"]["center"],
-                        self.coordinates["circle"]["radius"])
+        self.DrawCircle(colors[0])
 
         self.DrawLine(colors[1],
                       self.coordinates["line"]["first_point"],
@@ -170,10 +230,12 @@ class Window(QtWidgets.QMainWindow):
 
     def TransferFigure(self, shift):
 
-        self.last_coordinates.append(self.coordinates)
-
-        self.coordinates["circle"]["center"][0] += shift[0]
-        self.coordinates["circle"]["center"][1] -= shift[1]
+        self.coordinates["circle"]["first_point"][0] += shift[0]
+        self.coordinates["circle"]["first_point"][1] -= shift[1]
+        self.coordinates["circle"]["second_point"][0] += shift[0]
+        self.coordinates["circle"]["second_point"][1] -= shift[1]
+        self.coordinates["circle"]["third_point"][0] += shift[0]
+        self.coordinates["circle"]["third_point"][1] -= shift[1]
 
         self.coordinates["line"]["first_point"][0] += shift[0]
         self.coordinates["line"]["first_point"][1] -= shift[1]
@@ -193,46 +255,93 @@ class Window(QtWidgets.QMainWindow):
         self.coordinates["right_quad"]["first_side"]["second_point"][0] += shift[0]
         self.coordinates["right_quad"]["first_side"]["second_point"][1] -= shift[1]
 
-    def GetXYParams(self, func_x, func_y):
+    def RotateFigure(self, center, angle):
 
-        tmp_x = func_x()
-        tmp_y = func_y()
+        self.coordinates["circle"]["first_point"] = \
+            RotatePoint(center, self.coordinates["circle"]["first_point"], angle)
+        self.coordinates["circle"]["second_point"] = \
+            RotatePoint(center, self.coordinates["circle"]["second_point"], angle)
+        self.coordinates["circle"]["third_point"] = \
+            RotatePoint(center, self.coordinates["circle"]["third_point"], angle)
 
-        if tmp_y == tmp_x == "":
-            return [], None
+        self.coordinates["line"]["first_point"] = \
+            RotatePoint(center, self.coordinates["line"]["first_point"], angle)
+        self.coordinates["line"]["second_point"] = \
+            RotatePoint(center, self.coordinates["line"]["second_point"], angle)
 
-        x, y = float(), float()
+        self.coordinates["ellipse"]["center"] = \
+            RotatePoint(center, self.coordinates["ellipse"]["center"], angle)
 
-        # Get coordinates
+        self.coordinates["left_quad"]["first_side"]["first_point"] = \
+            RotatePoint(center, self.coordinates["left_quad"]["first_side"]["first_point"], angle)
+        self.coordinates["left_quad"]["first_side"]["second_point"] = \
+            RotatePoint(center, self.coordinates["left_quad"]["first_side"]["second_point"], angle)
+
+        self.coordinates["right_quad"]["first_side"]["first_point"] = \
+            RotatePoint(center, self.coordinates["right_quad"]["first_side"]["first_point"], angle)
+        self.coordinates["right_quad"]["first_side"]["second_point"] = \
+            RotatePoint(center, self.coordinates["right_quad"]["first_side"]["second_point"], angle)
+
+    def GetAngle(self):
+
+        # Get angle (string)
+        s_angle = self.RotateField.toPlainText()
+
+        if s_angle == "":
+            return 0, False
+
+        # Get angle (float)
         try:
-            x, y = float(tmp_x), float(tmp_y)
+            f_angle = float(s_angle)
         except ValueError:
-            ErrorDialog("Ошибка получения координат",
-                        "Координаты центра масштабирования/поворота заданы некорректно",
-                        "Ожидались целые величины\n(заданы символьные значения)")
+            ErrorDialog("Ошибка получения угла",
+                        "Значение задано некорректно",
+                        "Ожидалось вещественное число\n(задано символьное значение)")
 
-            return [], ValueError
+            return -1, False
 
-        if int(x) != x or int(y) != y:
-            ErrorDialog("Ошибка получения координат",
-                        "Координаты центра масштабирования/поворота заданы некорректно",
-                        "Ожидались целые величины\n(заданы вещественные значения)")
-
-            return [], ValueError
-
-        return [int(x), int(y)], None
+        return f_angle, True
 
     def ExecTransFigure(self):
 
         # Get shift
-        shift, err = self.GetXYParams(self.OffsetXField.toPlainText, self.OffsetYField.toPlainText)
+        shift, err = GetXYParams(self.OffsetXField.toPlainText, self.OffsetYField.toPlainText)
         if err == ValueError:
             return
 
         if len(shift) != 0:
             self.TransferFigure(shift)
 
-         # После всех преобразований вывод итоговых координат и добавление последних координат
+        # Get input angle
+        input_angle, is_correct = self.GetAngle()
+        if is_correct is not True and input_angle == -1:
+            return
+
+        if is_correct is True:
+
+            # Get center
+            center, err = GetXYParams(self.CenterXField.toPlainText, self.CenterYField.toPlainText)
+            if err == ValueError:
+                return
+
+            if len(center) != 0:
+                self.RotateFigure(center, input_angle)
+            else:
+                ErrorDialog("Ошибка получения координат",
+                            "Координаты центра поворота/масштабирования не были заданы",
+                            "Ожидались целые величины\n")
+                return
+
+        # Очистить поле и нарисовать фигуру после всех преобразований
+
+        tmp_coordinates = self.coordinates
+        self.DeleteGraph()
+        self.coordinates = tmp_coordinates
+
+        # Draw figure
+        self.DrawFigure()
+
+        self.last_coordinates.append(self.coordinates)
 
     def DrawLine(self, color, first_point, second_point):
 
@@ -250,7 +359,7 @@ class Window(QtWidgets.QMainWindow):
         self.GraphField.update()
         painter.end()
 
-    def DrawCircle(self, color, center, radius):
+    def DrawCircle(self, color):
 
         # Set the painter
         painter = QtGui.QPainter(self.GraphField.pixmap())
@@ -258,6 +367,17 @@ class Window(QtWidgets.QMainWindow):
         pen.setWidth(2)
         pen.setColor(QtGui.QColor(color))
         painter.setPen(pen)
+
+        # Get center
+        center = GetCircleCenter(self.coordinates["circle"]["first_point"],
+                                 self.coordinates["circle"]["second_point"],
+                                 self.coordinates["circle"]["third_point"])
+
+        # Get radius
+        radius = GetCircleRadius(self.coordinates["circle"]["first_point"],
+                                 self.coordinates["circle"]["second_point"],
+                                 self.coordinates["circle"]["third_point"],
+                                 center) + 25
 
         # Draw the circle
         painter.drawEllipse(center[0], center[1], radius, radius)
@@ -288,10 +408,13 @@ class Window(QtWidgets.QMainWindow):
         try:
             self.coordinates = self.last_coordinates.pop()
         except IndexError:
-            self.coordinates = default_coordinates
+            self.DeleteGraph()
+            return
 
         # Clear graph
+        tmp_coordinates = self.coordinates
         self.DeleteGraph()
+        self.coordinates = tmp_coordinates
 
         # Draw figure
         self.DrawFigure()
@@ -326,7 +449,6 @@ class Window(QtWidgets.QMainWindow):
 
 
 if __name__ == "__main__":
-
     # Create the Qt Application
     app = QtWidgets.QApplication([])
     application = Window()
