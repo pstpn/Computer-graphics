@@ -5,7 +5,6 @@ import sys
 
 import calculate
 
-
 # Colors
 colors = [
     '#FFFF00', '#FF00FF', '#00BFFF', '#E0FFFF', '#FF0000', '#00FF7F',
@@ -14,11 +13,10 @@ colors = [
 ]
 
 # Transfers coordinates to the coordinate system of the canvas
-DX, DY = 360, 400
+DX, DY = 360, 360
 
 
 def ErrorDialog(title, name, info):
-
     # Create a message box
     msg = QtWidgets.QMessageBox()
     msg.setIcon(QtWidgets.QMessageBox.Information)
@@ -55,6 +53,7 @@ class Window(QtWidgets.QMainWindow):
         self.ClearTable.setShortcut("Ctrl+W")
         self.ClearGraph.clicked.connect(self.DeleteGraph)
         self.ClearGraph.setShortcut("Ctrl+F")
+        self.FindTriangle.clicked.connect(self.FindAnswerTriangle)
 
         self.Quit.setShortcut("Ctrl+D")
         self.Quit.triggered.connect(QtWidgets.qApp.quit)
@@ -70,18 +69,18 @@ class Window(QtWidgets.QMainWindow):
         painter = QtGui.QPainter(self.Label.pixmap())
         pen = QtGui.QPen()
         pen.setWidth(3)
-        pen.setColor(QtGui.QColor("white"))
+        pen.setColor(QtGui.QColor("gray"))
         painter.setPen(pen)
 
-        painter.drawLine(0, 400, 720, 400)
-        painter.drawLine(360, 0, 360, 800)
+        painter.drawLine(0, DY, DX * 2, DY)
+        painter.drawLine(DX, 0, DX, DY * 2)
 
         painter.end()
 
     def SetCoordinates(self):
 
         # Set canvas
-        canvas = QtGui.QPixmap(720, 800)
+        canvas = QtGui.QPixmap(DX * 2, DY * 2)
         self.Label.setPixmap(canvas)
 
         # Draw axes
@@ -146,7 +145,7 @@ class Window(QtWidgets.QMainWindow):
         self.AddPointToTable(row, new_x, new_y)
 
         # Add point to coordinates
-        self.coordinates[row + 1] = (new_x, new_y)
+        self.coordinates[row + 1] = (new_x + DX, DY - new_y)
 
     def DeletePointWithNum(self):
 
@@ -233,30 +232,35 @@ class Window(QtWidgets.QMainWindow):
         self.Table.setItem(number - 1, 2, QtWidgets.QTableWidgetItem(str(new_y)))
 
         # Update point in coordinates
-        self.coordinates[number] = (new_x, new_y)
+        self.coordinates[number] = (new_x + DX, DY - new_y)
 
-    def DrawAnswer(self):
+    def FindAnswerTriangle(self):
 
-        self.DataCompletion()
-
+        # Check coordinates
         if not self.coordinates:
             ErrorDialog("Ошибка получения координат",
                         "Координаты не были заданы. Попробуйте снова",
                         "")
             return
 
-        max_angle, triangle_points = calculate.GetMaxAngle(self.coordinates)
+        # Get max angle and triangle points
+        max_angle, triangle_points, inter_heights = calculate.GetMaxAngle(self.coordinates, DX, DY)
 
+        # Check triangle points
         if not triangle_points:
             ErrorDialog("Ошибка поиска решений",
                         "Треугольник, удовлетворяющий условию, не был найден. Попробуйте снова",
                         "")
             return
 
+        # Clear label
+        self.DeleteGraph()
+
+        # Draw triangle
         painter = QtGui.QPainter(self.Label.pixmap())
         pen = QtGui.QPen()
         pen.setWidth(3)
-        pen.setColor(QtGui.QColor("white"))
+        pen.setColor(QtGui.QColor(choice(colors)))
         painter.setPen(pen)
 
         # Draw triangle
@@ -269,11 +273,17 @@ class Window(QtWidgets.QMainWindow):
         painter.drawLine(triangle_points[2][0], triangle_points[2][1],
                          triangle_points[0][0], triangle_points[0][1])
 
-        # Draw text
-        font = QtGui.QFont()
-        font.setPointSize(12)
-        painter.setFont(font)
-        painter.drawText(10, 10, f"Максимальный угол: {max_angle}")
+        # Draw points number and coordinates on canvas near point
+        for i in range(3):
+            painter.drawText(triangle_points[i][0] + 10, triangle_points[i][1] + 10,
+                             f"{i + 1} ({triangle_points[i][0] - DX}, {DY - triangle_points[i][1]})")
+
+        # Draw result
+        self.AnswerLabel.setText(f"Полученный максимальный угол: {max_angle} градусов\n"
+                                 f"Точки треугольника: "
+                                 f"({triangle_points[0][0] - DX}, {DY - triangle_points[0][1]}), "
+                                 f"({triangle_points[1][0] - DX}, {DY - triangle_points[1][1]}), "
+                                 f"({triangle_points[2][0] - DX}, {DY - triangle_points[2][1]})")
 
         self.Label.update()
         painter.end()
@@ -298,15 +308,31 @@ class Window(QtWidgets.QMainWindow):
         self.AddPointToTable(
             row,
             self.coordinates[row + 1][0] - DX,
-            -(self.coordinates[row + 1][1] - DY))
+            DY - self.coordinates[row + 1][1])
 
         # Draw point
         painter.drawPoint(self.coordinates[row + 1][0], self.coordinates[row + 1][1])
+
+        # Draw points number and coordinates on canvas near point
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        painter.setFont(font)
+        painter.drawText(self.coordinates[row + 1][0] + 10,
+                         self.coordinates[row + 1][1] + 10,
+                         f"{row + 1} ({self.coordinates[row + 1][0] - DX}; {DY - self.coordinates[row + 1][1]})")
 
         self.update()
         painter.end()
 
         return super().mousePressEvent(e)
+
+    def mouseMoveEvent(self, e):
+
+        # Get coordinates
+        x, y = e.pos().x() - 10, e.pos().y() - 36
+
+        # Set coordinates to label
+        self.MouseCoordinatesLabel.setText(f"Текущие координаты: ({x - DX}; {DY - y})")
 
     def mouseReleaseEvent(self, e):
 
