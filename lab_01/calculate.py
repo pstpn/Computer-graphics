@@ -1,7 +1,3 @@
-# На плоскости дано множество точек.
-# Найти такой треугольник с вершинами в этих точках, у которого угол, образованный прямой, соединяющей точку пересечения
-# высот и начало координат, и осью ординат максимален.
-
 import math
 
 
@@ -40,6 +36,9 @@ def GetMaxAngle(points, x_c, y_c):
 
     max_angle = 0
     max_angle_points = []
+
+    # Coordinates of the point of intersection of the heights
+    x_i, y_i = None, None
 
     for i in points.keys():
         for j in range(i + 1, len(points) + 1):

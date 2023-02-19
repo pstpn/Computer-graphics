@@ -1,6 +1,9 @@
+# На плоскости дано множество точек.
+# Найти такой треугольник с вершинами в этих точках, у которого угол, образованный прямой, соединяющей точку пересечения
+# высот и начало координат, и осью ординат максимален.
+
 from secrets import choice
 from PyQt5 import QtWidgets, QtCore, QtGui, uic
-from PyQt5.QtCore import Qt
 import sys
 
 import calculate
@@ -17,6 +20,7 @@ DX, DY = 360, 360
 
 
 def ErrorDialog(title, name, info):
+
     # Create a message box
     msg = QtWidgets.QMessageBox()
     msg.setIcon(QtWidgets.QMessageBox.Information)
@@ -29,6 +33,42 @@ def ErrorDialog(title, name, info):
 
     # Show the message box
     msg.exec_()
+
+
+def ZoomOut(triangle):
+
+    # Get max and min coordinates
+    max_x, min_x = max(*triangle, key=lambda x: x[0])[0],\
+        min(*triangle, key=lambda x: x[0])[0]
+    max_y, min_y = max(*triangle, key=lambda x: x[1])[1],\
+        min(*triangle, key=lambda x: x[1])[1]
+
+    # Scale coordinates
+    scale_coordinates = [[x, y] for x, y in triangle]
+
+    while max_x > 1.1 * DX or max_y > 1.1 * DY or \
+            min_x < -1 or min_y < -1:
+        max_x /= 2
+        max_y /= 2
+
+        min_x /= 2
+        min_y /= 2
+
+        for i in range(len(scale_coordinates)):
+            scale_coordinates[i] = [scale_coordinates[i][0] / 2, scale_coordinates[i][1] / 2]
+
+    k = 1
+
+    while max(*[x[0] + DX / k for x in scale_coordinates]) > DX or \
+            max(*[x[1] + DY / k for x in scale_coordinates]) > DY:
+        k += 1
+
+    for i in range(len(scale_coordinates)):
+        scale_coordinates[i] = [int(scale_coordinates[i][0] + DX / k), int(scale_coordinates[i][1] + DY / k)]
+
+    print(scale_coordinates)
+
+    return scale_coordinates
 
 
 class Window(QtWidgets.QMainWindow):
@@ -253,33 +293,40 @@ class Window(QtWidgets.QMainWindow):
                         "")
             return
 
+        # Get scale figure
+        scaled_triangle_points = triangle_points
+
+        if max(*triangle_points, key=lambda x: x[0])[0] > 2 * DX or \
+                max(*triangle_points, key=lambda x: x[1])[1] > 2 * DY:
+            scaled_triangle_points = ZoomOut(triangle_points)
+
         # Clear label
         self.DeleteGraph()
 
         # Draw triangle
         painter = QtGui.QPainter(self.Label.pixmap())
         pen = QtGui.QPen()
-        pen.setWidth(3)
+        pen.setWidth(2)
         pen.setColor(QtGui.QColor(choice(colors)))
         painter.setPen(pen)
 
-        # Draw triangle
-        painter.drawLine(triangle_points[0][0], triangle_points[0][1],
-                         triangle_points[1][0], triangle_points[1][1])
+        painter.drawLine(int(scaled_triangle_points[0][0]), int(scaled_triangle_points[0][1]),
+                         int(scaled_triangle_points[1][0]), int(scaled_triangle_points[1][1]))
 
-        painter.drawLine(triangle_points[1][0], triangle_points[1][1],
-                         triangle_points[2][0], triangle_points[2][1])
+        painter.drawLine(int(scaled_triangle_points[1][0]), int(scaled_triangle_points[1][1]),
+                         int(scaled_triangle_points[2][0]), int(scaled_triangle_points[2][1]))
 
-        painter.drawLine(triangle_points[2][0], triangle_points[2][1],
-                         triangle_points[0][0], triangle_points[0][1])
+        painter.drawLine(int(scaled_triangle_points[2][0]), int(scaled_triangle_points[2][1]),
+                         int(scaled_triangle_points[0][0]), int(scaled_triangle_points[0][1]))
 
         # Draw points number and coordinates on canvas near point
         for i in range(3):
-            painter.drawText(triangle_points[i][0] + 10, triangle_points[i][1] + 10,
+            painter.drawText(int(scaled_triangle_points[i][0] + 10), int(scaled_triangle_points[i][1] + 10),
                              f"{i + 1} ({triangle_points[i][0] - DX}, {DY - triangle_points[i][1]})")
 
         # Draw result
-        self.AnswerLabel.setText(f"Полученный максимальный угол: {max_angle} градусов\n"
+        self.AnswerLabel.setText(f"Полученный максимальный угол: {round(max_angle, 2)} градусов\n"
+                                 f"Точка пересечения высот: ({int(inter_heights[0])}; {int(inter_heights[1])})\n"
                                  f"Точки треугольника: "
                                  f"({triangle_points[0][0] - DX}, {DY - triangle_points[0][1]}), "
                                  f"({triangle_points[1][0] - DX}, {DY - triangle_points[1][1]}), "
@@ -360,6 +407,7 @@ class Window(QtWidgets.QMainWindow):
 
 
 if __name__ == '__main__':
+
     # Run application
     app = QtWidgets.QApplication([])
     application = Window()
