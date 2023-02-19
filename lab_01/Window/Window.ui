@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1288</width>
+    <height>877</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 13pt &quot;URW Gothic&quot;;</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QPushButton" name="FindTriangle">
+    <property name="geometry">
+     <rect>
+      <x>740</x>
+      <y>740</y>
+      <width>531</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Найти треугольник</string>
+    </property>
+   </widget>
+   <widget class="QTableWidget" name="Table">
+    <property name="geometry">
+     <rect>
+      <x>740</x>
+      <y>40</y>
+      <width>531</width>
+      <height>241</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">alternate-background-color: rgb(0, 0, 0);</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="Label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>9</y>
+      <width>720</width>
+      <height>800</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>720</width>
+      <height>800</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>720</width>
+      <height>800</height>
+     </size>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ClearGraph">
+    <property name="geometry">
+     <rect>
+      <x>740</x>
+      <y>640</y>
+      <width>531</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Очистить графическое поле</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ClearTable">
+    <property name="geometry">
+     <rect>
+      <x>740</x>
+      <y>540</y>
+      <width>531</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Очистить таблицу c точками</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>740</x>
+      <y>10</y>
+      <width>531</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Таблица координат&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="DeletePoint">
+    <property name="geometry">
+     <rect>
+      <x>740</x>
+      <y>300</y>
+      <width>251</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Удалить точку с номером:</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="DelNumPointField">
+    <property name="geometry">
+     <rect>
+      <x>1010</x>
+      <y>300</y>
+      <width>261</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="centerOnScroll">
+     <bool>false</bool>
+    </property>
+    <property name="placeholderText">
+     <string>Номер точки</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="AddXField">
+    <property name="geometry">
+     <rect>
+      <x>1060</x>
+      <y>360</y>
+      <width>101</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="centerOnScroll">
+     <bool>false</bool>
+    </property>
+    <property name="placeholderText">
+     <string>X</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="AddPoint">
+    <property name="geometry">
+     <rect>
+      <x>740</x>
+      <y>360</y>
+      <width>301</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Добавить точку с координатами:</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="AddYField">
+    <property name="geometry">
+     <rect>
+      <x>1180</x>
+      <y>360</y>
+      <width>91</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="centerOnScroll">
+     <bool>false</bool>
+    </property>
+    <property name="placeholderText">
+     <string>Y</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ChangePoint">
+    <property name="geometry">
+     <rect>
+      <x>740</x>
+      <y>420</y>
+      <width>531</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Изменить координаты точки на новые:</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="ChangeNumPointField">
+    <property name="geometry">
+     <rect>
+      <x>740</x>
+      <y>480</y>
+      <width>121</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="centerOnScroll">
+     <bool>false</bool>
+    </property>
+    <property name="placeholderText">
+     <string>Номер точки</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="UpdateXField">
+    <property name="geometry">
+     <rect>
+      <x>880</x>
+      <y>480</y>
+      <width>181</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="centerOnScroll">
+     <bool>false</bool>
+    </property>
+    <property name="placeholderText">
+     <string>Новый X</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="UpdateYField">
+    <property name="geometry">
+     <rect>
+      <x>1080</x>
+      <y>480</y>
+      <width>191</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="centerOnScroll">
+     <bool>false</bool>
+    </property>
+    <property name="placeholderText">
+     <string>Новый Y</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1288</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>Выход</string>
+    </property>
+    <addaction name="Quit"/>
+   </widget>
+   <addaction name="menu_2"/>
+  </widget>
+  <action name="ClearAll">
+   <property name="text">
+    <string>Очистить все поля</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>URW Bookman</family>
+     <weight>75</weight>
+     <italic>false</italic>
+     <bold>true</bold>
+    </font>
+   </property>
+  </action>
+  <action name="Quit">
+   <property name="text">
+    <string>Выход</string>
+   </property>
+  </action>
+  <action name="ClearAll_2">
+   <property name="text">
+    <string>Очистить все</string>
+   </property>
+  </action>
+  <action name="Finding">
+   <property name="text">
+    <string>Найти четырехугольники</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
