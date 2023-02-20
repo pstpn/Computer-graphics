@@ -19,6 +19,43 @@ colors = [
 DX, DY = 360, 360
 
 
+def PrintInfo(title, text):
+
+    # Create a message box
+    msg = QtWidgets.QMessageBox()
+    msg.setIcon(QtWidgets.QMessageBox.Information)
+
+    # Set the message box text
+    msg.setWindowTitle(title)
+    msg.setText(text)
+    msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+
+    # Show the message box
+    msg.exec_()
+
+
+def PrintAuthorInfo():
+
+    PrintInfo(
+            "Информация об авторе",
+            "Задание выполнил Постнов Степан Андреевич,\n"
+            "студент группы ИУ7-41Б"
+    )
+
+
+def PrintTaskInfo():
+
+    PrintInfo(
+            "Условие задания",
+            "На плоскости дано множество точек.\n"
+            "Найти такой треугольник с вершинами в этих точках, \n"
+            "у которого угол, образованный прямой, соединяющей\n "
+            "точку пересечения высот и начало координат, и осью ординат максимален.\n"
+            "Вывести изображение в графическом режиме."
+
+    )
+
+
 def ErrorDialog(title, name, info):
 
     # Create a message box
@@ -46,9 +83,6 @@ def ZoomOut(triangle):
     # Scale coordinates
     scale_coordinates = [[x, y] for x, y in triangle]
 
-    # Center of the coordinate system
-    new_center = [max_x - (max_x - min_x) / 2, max_y - (max_y - min_y) / 2]
-
     while max_x > 1.1 * DX or max_y > 1.1 * DY or \
             min_x < -1 or min_y < -1:
         max_x /= 2
@@ -60,18 +94,9 @@ def ZoomOut(triangle):
         for i in range(len(scale_coordinates)):
             scale_coordinates[i] = [scale_coordinates[i][0] / 2, scale_coordinates[i][1] / 2]
 
-    k = 1
-
-    while max(*[x[0] + DX / k for x in scale_coordinates]) > DX or \
-            max(*[x[1] + DY / k for x in scale_coordinates]) > DY:
-        k += 0.1
-
-    for i in range(len(scale_coordinates)):
-        scale_coordinates[i] = [int(scale_coordinates[i][0] + DX / k), int(scale_coordinates[i][1] + DY / k)]
-
     print(scale_coordinates)
 
-    return scale_coordinates, new_center
+    return scale_coordinates
 
 
 class Window(QtWidgets.QMainWindow):
@@ -94,9 +119,12 @@ class Window(QtWidgets.QMainWindow):
         self.ChangePoint.clicked.connect(self.UpdatePointWithNum)
         self.ClearTable.clicked.connect(lambda clear_table: self.ClearTableData())
         self.ClearTable.setShortcut("Ctrl+W")
-        self.ClearGraph.clicked.connect(self.DeleteGraph)
+        self.ClearGraph.clicked.connect(self.DeleteGraphAndInit)
         self.ClearGraph.setShortcut("Ctrl+F")
         self.FindTriangle.clicked.connect(self.FindAnswerTriangle)
+
+        self.AuthorInfo.triggered.connect(PrintAuthorInfo)
+        self.TaskInfo.triggered.connect(PrintTaskInfo)
 
         self.Quit.setShortcut("Ctrl+D")
         self.Quit.triggered.connect(QtWidgets.qApp.quit)
@@ -173,9 +201,9 @@ class Window(QtWidgets.QMainWindow):
         self.Table.setColumnCount(3)
 
         # Set table column width
-        self.Table.setColumnWidth(0, 175)
-        self.Table.setColumnWidth(1, 175)
-        self.Table.setColumnWidth(2, 175)
+        self.Table.setColumnWidth(0, 193)
+        self.Table.setColumnWidth(1, 193)
+        self.Table.setColumnWidth(2, 193)
 
         # Set table headers
         self.Table.setHorizontalHeaderLabels(["Number", "X", "Y"])
@@ -324,6 +352,12 @@ class Window(QtWidgets.QMainWindow):
                         "")
             return
 
+        if len(self.coordinates) < 3:
+            ErrorDialog("Ошибка построения",
+                        "Недостаточно точек для построения треугольника. Попробуйте снова",
+                        "")
+            return
+
         # Get max angle and triangle points
         max_angle, triangle_points, inter_heights = calculate.GetMaxAngle(self.coordinates, DX, DY)
 
@@ -344,14 +378,17 @@ class Window(QtWidgets.QMainWindow):
         # Get scale figure
         scaled_triangle_points = triangle_points
 
-        # Clear label
-        self.DeleteGraph()
-
         # Check scale figure
         if max(*triangle_points, key=lambda x: x[0])[0] > 2 * DX or \
                 max(*triangle_points, key=lambda x: x[1])[1] > 2 * DY:
-            scaled_triangle_points, new_center = ZoomOut(triangle_points)
-            # self.DrawCenterCoordinates(int(new_center[0]), int(new_center[1]))
+            scaled_triangle_points = ZoomOut(triangle_points)
+
+            # Clear label
+            self.DeleteGraph()
+        else:
+
+            # Clear label
+            self.DeleteGraphAndInit()
 
         # Draw triangle
         painter = QtGui.QPainter(self.Label.pixmap())
@@ -369,18 +406,24 @@ class Window(QtWidgets.QMainWindow):
         painter.drawLine(int(scaled_triangle_points[2][0]), int(scaled_triangle_points[2][1]),
                          int(scaled_triangle_points[0][0]), int(scaled_triangle_points[0][1]))
 
+        pen.setWidth(10)
+        painter.setPen(pen)
+
+        painter.drawPoint(int(scaled_triangle_points[0][0]), int(scaled_triangle_points[0][1]))
+        painter.drawPoint(int(scaled_triangle_points[1][0]), int(scaled_triangle_points[1][1]))
+        painter.drawPoint(int(scaled_triangle_points[2][0]), int(scaled_triangle_points[2][1]))
+
         # Draw points number and coordinates on canvas near point
         for i in range(3):
             painter.drawText(int(scaled_triangle_points[i][0] + 10), int(scaled_triangle_points[i][1] + 10),
-                             f"{i + 1} ({triangle_points[i][0] - DX}, {DY - triangle_points[i][1]})")
+                             f"{i + 1} ({int(triangle_points[i][0] - DX)}, {int(DY - triangle_points[i][1])})")
 
         # Draw result
         self.AnswerLabel.setText(f"Полученный максимальный угол: {round(max_angle, 2)} градусов\n"
-                                 f"Точка пересечения высот: ({int(inter_heights[0])}; {int(inter_heights[1])})\n"
                                  f"Точки треугольника: "
-                                 f"({triangle_points[0][0] - DX}, {DY - triangle_points[0][1]}), "
-                                 f"({triangle_points[1][0] - DX}, {DY - triangle_points[1][1]}), "
-                                 f"({triangle_points[2][0] - DX}, {DY - triangle_points[2][1]})")
+                                 f"({int(triangle_points[0][0] - DX)}, {int(DY - triangle_points[0][1])}), "
+                                 f"({int(triangle_points[1][0] - DX)}, {int(DY - triangle_points[1][1])}), "
+                                 f"({int(triangle_points[2][0] - DX)}, {int(DY - triangle_points[2][1])})")
 
         self.Label.update()
         painter.end()
@@ -399,7 +442,7 @@ class Window(QtWidgets.QMainWindow):
         self.Table.setRowCount(row + 1)
 
         # Adding to coordinates
-        self.coordinates[row + 1] = (e.pos().x() - 10, e.pos().y() - 36)
+        self.coordinates[row + 1] = (e.pos().x() - 10, e.pos().y() - 42)
 
         # Add point to table
         self.AddPointToTable(
@@ -426,7 +469,7 @@ class Window(QtWidgets.QMainWindow):
     def mouseMoveEvent(self, e):
 
         # Get coordinates
-        x, y = e.pos().x() - 10, e.pos().y() - 36
+        x, y = e.pos().x() - 10, e.pos().y() - 42
 
         # Set coordinates to label
         self.MouseCoordinatesLabel.setText(f"Текущие координаты: ({x - DX}; {DY - y})")
@@ -454,6 +497,14 @@ class Window(QtWidgets.QMainWindow):
 
         # Draw grid
         self.DrawGrid()
+
+        # Update label
+        self.Label.update()
+
+    def DeleteGraphAndInit(self):
+
+        # Clear canvas
+        self.DeleteGraph()
 
         # Draw center
         self.DrawCenterCoordinates(DX, DY)

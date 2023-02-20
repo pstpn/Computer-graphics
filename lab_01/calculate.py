@@ -38,7 +38,7 @@ def GetMaxAngle(points, x_c, y_c):
     max_angle_points = []
 
     # Coordinates of the point of intersection of the heights
-    x_i, y_i = None, None
+    x_inter, y_inter = None, None
 
     for i in points.keys():
         for j in range(i + 1, len(points) + 1):
@@ -72,5 +72,6 @@ def GetMaxAngle(points, x_c, y_c):
                 if angle > max_angle:
                     max_angle = angle
                     max_angle_points = [points[i], points[j], points[k]]
+                    x_inter, y_inter = x_i, y_i
 
-    return max_angle, max_angle_points, (x_i, y_i)
+    return max_angle, max_angle_points, (x_inter, y_inter)
