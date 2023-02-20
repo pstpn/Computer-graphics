@@ -46,6 +46,9 @@ def ZoomOut(triangle):
     # Scale coordinates
     scale_coordinates = [[x, y] for x, y in triangle]
 
+    # Center of the coordinate system
+    new_center = [max_x - (max_x - min_x) / 2, max_y - (max_y - min_y) / 2]
+
     while max_x > 1.1 * DX or max_y > 1.1 * DY or \
             min_x < -1 or min_y < -1:
         max_x /= 2
@@ -61,14 +64,14 @@ def ZoomOut(triangle):
 
     while max(*[x[0] + DX / k for x in scale_coordinates]) > DX or \
             max(*[x[1] + DY / k for x in scale_coordinates]) > DY:
-        k += 1
+        k += 0.1
 
     for i in range(len(scale_coordinates)):
         scale_coordinates[i] = [int(scale_coordinates[i][0] + DX / k), int(scale_coordinates[i][1] + DY / k)]
 
     print(scale_coordinates)
 
-    return scale_coordinates
+    return scale_coordinates, new_center
 
 
 class Window(QtWidgets.QMainWindow):
@@ -103,6 +106,21 @@ class Window(QtWidgets.QMainWindow):
         self.last_x = None
         self.last_y = None
 
+    def DrawCenterCoordinates(self, x, y):
+
+        # Draw center
+        painter = QtGui.QPainter(self.Label.pixmap())
+        pen = QtGui.QPen()
+        pen.setWidth(10)
+        pen.setColor(QtGui.QColor(choice(colors)))
+        painter.setPen(pen)
+        painter.drawPoint(DX, DY)
+
+        painter.setFont(QtGui.QFont("Times", 10))
+        painter.drawText(DX + 10, DY + 20, f"O ({x - DX}, {y - DY})")
+
+        painter.end()
+
     def DrawAxes(self):
 
         # Draw axes
@@ -117,6 +135,23 @@ class Window(QtWidgets.QMainWindow):
 
         painter.end()
 
+    def DrawGrid(self):
+
+        # Draw grid
+        painter = QtGui.QPainter(self.Label.pixmap())
+        pen = QtGui.QPen()
+        pen.setWidth(1)
+        pen.setColor(QtGui.QColor("gray"))
+        painter.setPen(pen)
+
+        for i in range(1, 10):
+            painter.drawLine(0, DY + i * 40, DX * 2, DY + i * 40)
+            painter.drawLine(0, DY - i * 40, DX * 2, DY - i * 40)
+            painter.drawLine(DX + i * 40, 0, DX + i * 40, DY * 2)
+            painter.drawLine(DX - i * 40, 0, DX - i * 40, DY * 2)
+
+        painter.end()
+
     def SetCoordinates(self):
 
         # Set canvas
@@ -125,6 +160,12 @@ class Window(QtWidgets.QMainWindow):
 
         # Draw axes
         self.DrawAxes()
+
+        # Draw grid
+        self.DrawGrid()
+
+        # Draw center
+        self.DrawCenterCoordinates(DX, DY)
 
     def SetTable(self):
 
@@ -287,21 +328,30 @@ class Window(QtWidgets.QMainWindow):
         max_angle, triangle_points, inter_heights = calculate.GetMaxAngle(self.coordinates, DX, DY)
 
         # Check triangle points
-        if not triangle_points:
+        if len(triangle_points) != 3:
             ErrorDialog("Ошибка поиска решений",
                         "Треугольник, удовлетворяющий условию, не был найден. Попробуйте снова",
+                        "")
+            return
+
+        # Check intersection heights
+        if inter_heights[0] is None or inter_heights[1] is None:
+            ErrorDialog("Ошибка поиска решений",
+                        "Вырожденный случай. Попробуйте снова",
                         "")
             return
 
         # Get scale figure
         scaled_triangle_points = triangle_points
 
-        if max(*triangle_points, key=lambda x: x[0])[0] > 2 * DX or \
-                max(*triangle_points, key=lambda x: x[1])[1] > 2 * DY:
-            scaled_triangle_points = ZoomOut(triangle_points)
-
         # Clear label
         self.DeleteGraph()
+
+        # Check scale figure
+        if max(*triangle_points, key=lambda x: x[0])[0] > 2 * DX or \
+                max(*triangle_points, key=lambda x: x[1])[1] > 2 * DY:
+            scaled_triangle_points, new_center = ZoomOut(triangle_points)
+            # self.DrawCenterCoordinates(int(new_center[0]), int(new_center[1]))
 
         # Draw triangle
         painter = QtGui.QPainter(self.Label.pixmap())
@@ -401,6 +451,12 @@ class Window(QtWidgets.QMainWindow):
 
         # Draw axes
         self.DrawAxes()
+
+        # Draw grid
+        self.DrawGrid()
+
+        # Draw center
+        self.DrawCenterCoordinates(DX, DY)
 
         # Update label
         self.Label.update()
