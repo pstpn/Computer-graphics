@@ -1,8 +1,9 @@
-import math
 import sys
 import copy
 
 from PyQt5 import QtWidgets, QtCore, QtGui, uic
+from calculate import RotatePoint, ScalePoint, GetXYParams, GetDXLen, GetDYLen, GetCircleCenter, GetAngle
+from tools import ClearCoordinates, DeepCopy, ErrorDialog
 
 
 # Default coordinates
@@ -45,170 +46,7 @@ DX, DY = 450, 360
 colors = ["#FF0000", "#800080", "#FFFF00"]
 
 
-# Function for deep copying
-def DeepCopy(dst, src):
-
-    dst["circle"]["first_point"] = src["circle"]["first_point"].copy()
-    dst["circle"]["second_point"] = src["circle"]["second_point"].copy()
-    dst["circle"]["third_point"] = src["circle"]["third_point"].copy()
-    dst["circle"]["radius_x"] = src["circle"]["radius_x"]
-    dst["circle"]["radius_y"] = src["circle"]["radius_y"]
-    dst["circle"]["points"] = src["circle"]["points"].copy()
-
-    dst["line"]["first_point"] = src["line"]["first_point"].copy()
-    dst["line"]["second_point"] = src["line"]["second_point"].copy()
-
-    dst["ellipse"]["radius_x"] = src["ellipse"]["radius_x"]
-    dst["ellipse"]["radius_y"] = src["ellipse"]["radius_y"]
-    dst["ellipse"]["points"] = src["ellipse"]["points"].copy()
-
-    dst["left_quad"]["first_side"]["first_point"] = \
-        src["left_quad"]["first_side"]["first_point"].copy()
-    dst["left_quad"]["first_side"]["second_point"] = \
-        src["left_quad"]["first_side"]["second_point"].copy()
-
-    dst["right_quad"]["first_side"]["first_point"] = \
-        src["right_quad"]["first_side"]["first_point"].copy()
-    dst["right_quad"]["first_side"]["second_point"] = \
-        src["right_quad"]["first_side"]["second_point"].copy()
-
-
-# Function for clearing coordinates
-def ClearCoordinates(coordinates):
-
-    coordinates["circle"]["first_point"].clear()
-    coordinates["circle"]["second_point"].clear()
-    coordinates["circle"]["third_point"].clear()
-    coordinates["circle"]["radius_x"] = 0
-    coordinates["circle"]["radius_y"] = 0
-    coordinates["circle"]["points"].clear()
-
-    coordinates["line"]["first_point"].clear()
-    coordinates["line"]["second_point"].clear()
-
-    coordinates["ellipse"]["radius_x"] = 0
-    coordinates["ellipse"]["radius_y"] = 0
-    coordinates["ellipse"]["points"].clear()
-
-    coordinates["left_quad"]["first_side"]["first_point"].clear()
-    coordinates["left_quad"]["first_side"]["second_point"].clear()
-
-    coordinates["right_quad"]["first_side"]["first_point"].clear()
-    coordinates["right_quad"]["first_side"]["second_point"].clear()
-
-
-# Print error message
-def ErrorDialog(title, name, info):
-
-    # Create a message box
-    msg = QtWidgets.QMessageBox()
-    msg.setIcon(QtWidgets.QMessageBox.Information)
-
-    # Set the message box text
-    msg.setText(name)
-    msg.setInformativeText(info)
-    msg.setWindowTitle(title)
-    msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
-
-    # Show the message box
-    msg.exec_()
-
-
-# Rotate the point around the center
-def RotatePoint(center, point, angle):
-
-    return [(center[0] + (point[0] - center[0]) * math.cos(math.radians(angle)) +
-             (point[1] - center[1]) *
-             math.sin(math.radians(angle))),
-            (center[1] - (point[0] - center[0]) * math.sin(math.radians(angle)) +
-             (point[1] - center[1]) *
-             math.cos(math.radians(angle)))]
-
-
-# Scale the point around the center
-def ScalePoint(center, point, scale):
-
-    return [(point[0] - center[0]) * scale[0] + center[0],
-            (point[1] - center[1]) * scale[1] + center[1]]
-
-
-# Get the coordinates of the point
-def GetXYParams(func_x, func_y):
-
-    tmp_x = func_x()
-    tmp_y = func_y()
-
-    if tmp_y == tmp_x == "":
-        return [], None
-
-    # Get coordinates
-    try:
-        x, y = float(tmp_x), float(tmp_y)
-    except ValueError:
-        ErrorDialog("Ошибка получения координат",
-                    "Координаты заданы некорректно",
-                    "Ожидались целые величины\n(заданы символьные значения)")
-
-        return [], ValueError
-
-    return [int(x), int(y)], None
-
-
-# Get the center of the circle
-def GetCircleCenter(first_point, second_point, third_point):
-
-    x1, y1 = first_point
-    x2, y2 = second_point
-    x3, y3 = third_point
-
-    if x3 == x2 or x2 == x1:
-        x2 += 1e-11
-
-    m1 = (y2 - y1) / (x2 - x1)
-    m2 = (y3 - y2) / (x3 - x2)
-
-    if m1 == 0 or m1 == m2:
-        m1 += 1e-11
-
-    xc = (m1 * m2 * (y1 - y3) + m2 * (x1 + x2) - m1 * (x2 + x3)) / (2 * (m2 - m1))
-    yc = (-1 / m1) * (xc - (x1 + x2) / 2) + (y1 + y2) / 2
-
-    return [int(xc), int(yc)]
-
-
-# Get the length of the vector in the X direction
-def GetDXLen(input_len, angle):
-
-    return input_len * math.cos(angle * math.pi / 180.0)
-
-
-# Get the length of the vector in the Y direction
-def GetDYLen(input_len, angle):
-
-    return input_len * math.sin(angle * math.pi / 180.0)
-
-
-# Get angle between two lines
-def GetAngle(first_point, second_point, third_point):
-
-    x1, y1 = first_point
-    x2, y2 = second_point
-    x3, y3 = third_point
-
-    if x1 == x2 or x2 == x3:
-        x2 += 1e-11
-
-    m1 = (y2 - y1) / (x2 - x1)
-    m2 = (y3 - y2) / (x3 - x2)
-
-    if m1 == 0 or m1 == m2:
-        m1 += 1e-11
-
-    angle = math.degrees(math.atan((m2 - m1) / (1 + m1 * m2)))
-
-    return angle
-
-
+# Main window class
 class Window(QtWidgets.QMainWindow):
     def __init__(self):
 
@@ -266,13 +104,16 @@ class Window(QtWidgets.QMainWindow):
             }
         }
 
+        # Last coordinates of figure
         self.last_coordinates = []
 
+    # Set the graph field
     def SetGraphField(self):
 
         canvas = QtGui.QPixmap(900, 720)
         self.GraphField.setPixmap(canvas)
 
+    # Draw initial figure
     def InitDrawFigure(self):
 
         # Save coordinates
@@ -287,22 +128,27 @@ class Window(QtWidgets.QMainWindow):
         # Draw figure
         self.DrawFigure()
 
+    # Draw figure
     def DrawFigure(self):
 
+        # Check if the coordinates are empty
         if len(self.coordinates["circle"]["first_point"]) == 0:
             return
 
-        # Draw the figure
+        # Draw circle
         self.DrawCircle(colors[0])
 
+        # Draw line
         self.DrawLine(colors[1],
                       self.coordinates["line"]["first_point"],
                       self.coordinates["line"]["second_point"])
 
+        # Draw half ellipse
         self.DrawHalfEllipse(colors[2],
                              self.coordinates["ellipse"]["radius_x"],
                              self.coordinates["ellipse"]["radius_y"])
 
+        # Draw left quadrilateral
         self.DrawLine(colors[1],
                       self.coordinates["left_quad"]["first_side"]["first_point"],
                       self.coordinates["left_quad"]["first_side"]["second_point"])
@@ -327,6 +173,7 @@ class Window(QtWidgets.QMainWindow):
                                   self.coordinates["left_quad"]["first_side"]["first_point"],
                                   -90))
 
+        # Draw right quadrilateral
         self.DrawLine(colors[1],
                       self.coordinates["right_quad"]["first_side"]["first_point"],
                       self.coordinates["right_quad"]["first_side"]["second_point"])
@@ -351,6 +198,7 @@ class Window(QtWidgets.QMainWindow):
                                   self.coordinates["right_quad"]["first_side"]["first_point"],
                                   90))
 
+    # Transfer figure
     def TransferFigure(self, shift):
 
         # Check if the figure was drawn
@@ -372,6 +220,7 @@ class Window(QtWidgets.QMainWindow):
         # Transfer the quad
         self.TransferQuad(shift)
 
+    # Transfer the circle
     def TransferCircle(self, shift):
 
         self.coordinates["circle"]["first_point"][0] += shift[0]
@@ -385,12 +234,14 @@ class Window(QtWidgets.QMainWindow):
             self.coordinates["circle"]["points"][i][0] += shift[0]
             self.coordinates["circle"]["points"][i][1] -= shift[1]
 
+    # Transfer the half ellipse
     def TransferHalfEllipse(self, shift):
 
         for i in range(len(self.coordinates["ellipse"]["points"])):
             self.coordinates["ellipse"]["points"][i][0] += shift[0]
             self.coordinates["ellipse"]["points"][i][1] -= shift[1]
 
+    # Transfer the line
     def TransferLine(self, shift):
 
         self.coordinates["line"]["first_point"][0] += shift[0]
@@ -398,6 +249,7 @@ class Window(QtWidgets.QMainWindow):
         self.coordinates["line"]["second_point"][0] += shift[0]
         self.coordinates["line"]["second_point"][1] -= shift[1]
 
+    # Transfer the quad
     def TransferQuad(self, shift):
 
         self.coordinates["left_quad"]["first_side"]["first_point"][0] += shift[0]
@@ -410,6 +262,7 @@ class Window(QtWidgets.QMainWindow):
         self.coordinates["right_quad"]["first_side"]["second_point"][0] += shift[0]
         self.coordinates["right_quad"]["first_side"]["second_point"][1] -= shift[1]
 
+    # Rotate figure
     def RotateFigure(self, center, angle):
 
         # Check if the figure was drawn
@@ -431,6 +284,7 @@ class Window(QtWidgets.QMainWindow):
         # Rotate the quad
         self.RotateQuad(center, angle)
 
+    # Rotate the circle
     def RotateCircle(self, center, angle):
 
         self.coordinates["circle"]["first_point"] = \
@@ -445,6 +299,7 @@ class Window(QtWidgets.QMainWindow):
             self.coordinates["circle"]["points"][i] = \
                 RotatePoint(center, self.coordinates["circle"]["points"][i], angle)
 
+    # Rotate the half ellipse
     def RotateHalfEllipse(self, center, angle):
 
         for i in range(len(self.coordinates["ellipse"]["points"])):
@@ -452,6 +307,7 @@ class Window(QtWidgets.QMainWindow):
             self.coordinates["ellipse"]["points"][i] = \
                 RotatePoint(center, self.coordinates["ellipse"]["points"][i], angle)
 
+    # Rotate the line
     def RotateLine(self, center, angle):
 
         self.coordinates["line"]["first_point"] = \
@@ -459,6 +315,7 @@ class Window(QtWidgets.QMainWindow):
         self.coordinates["line"]["second_point"] = \
             RotatePoint(center, self.coordinates["line"]["second_point"], angle)
 
+    # Rotate the quad
     def RotateQuad(self, center, angle):
 
         self.coordinates["left_quad"]["first_side"]["first_point"] = \
@@ -471,6 +328,7 @@ class Window(QtWidgets.QMainWindow):
         self.coordinates["right_quad"]["first_side"]["second_point"] = \
             RotatePoint(center, self.coordinates["right_quad"]["first_side"]["second_point"], angle)
 
+    # Scale figure
     def ScaleFigure(self, center, scale):
 
         # Check if the figure was drawn
@@ -492,6 +350,7 @@ class Window(QtWidgets.QMainWindow):
         # Scale the quad
         self.ScaleQuad(center, scale)
 
+    # Scale the circle
     def ScaleCircle(self, center, scale):
 
         self.coordinates["circle"]["first_point"] = \
@@ -509,6 +368,7 @@ class Window(QtWidgets.QMainWindow):
             self.coordinates["circle"]["points"][i] = \
                 ScalePoint(center, self.coordinates["circle"]["points"][i], scale)
 
+    # Scale the half ellipse
     def ScaleHalfEllipse(self, center, scale):
 
         self.coordinates["ellipse"]["radius_x"] *= scale[0]
@@ -519,6 +379,7 @@ class Window(QtWidgets.QMainWindow):
             self.coordinates["ellipse"]["points"][i] = \
                 ScalePoint(center, self.coordinates["ellipse"]["points"][i], scale)
 
+    # Scale the line
     def ScaleLine(self, center, scale):
 
         self.coordinates["line"]["first_point"] = \
@@ -526,6 +387,7 @@ class Window(QtWidgets.QMainWindow):
         self.coordinates["line"]["second_point"] = \
             ScalePoint(center, self.coordinates["line"]["second_point"], scale)
 
+    # Scale the quad
     def ScaleQuad(self, center, scale):
 
         self.coordinates["left_quad"]["first_side"]["first_point"] = \
@@ -538,11 +400,13 @@ class Window(QtWidgets.QMainWindow):
         self.coordinates["right_quad"]["first_side"]["second_point"] = \
             ScalePoint(center, self.coordinates["right_quad"]["first_side"]["second_point"], scale)
 
+    # Get input angle
     def GetAngle(self):
 
         # Get angle (string)
         s_angle = self.RotateField.toPlainText()
 
+        # Check skip rotation
         if s_angle == "":
             return 0, False
 
@@ -558,11 +422,13 @@ class Window(QtWidgets.QMainWindow):
 
         return f_angle, True
 
+    # Get input scale
     def GetScale(self):
 
         # Get scale (string)
         s_scale_x, s_scale_y = self.ScaleXField.toPlainText(), self.ScaleYField.toPlainText()
 
+        # Check skip scaling
         if s_scale_x == s_scale_y == "":
             return [1, 1], False
 
@@ -578,8 +444,10 @@ class Window(QtWidgets.QMainWindow):
 
         return [f_scale_x, f_scale_y], True
 
+    # Execute transformation of the figure
     def ExecTransFigure(self):
 
+        # Check if the figure was drawn
         if len(self.coordinates["circle"]["first_point"]) == 0:
             ErrorDialog("Ошибка трансформации фигуры",
                         "Невозможно трансформировать фигуру, так как она не была нарисована",
@@ -594,6 +462,7 @@ class Window(QtWidgets.QMainWindow):
         if err == ValueError:
             return
 
+        # Shift the figure
         if len(shift) != 0:
             self.TransferFigure(shift)
 
@@ -612,6 +481,7 @@ class Window(QtWidgets.QMainWindow):
             center[0] += DX
             center[1] += DY
 
+            # Rotate the figure
             if len(center) != 0:
                 self.RotateFigure(center, input_angle)
             else:
@@ -635,6 +505,7 @@ class Window(QtWidgets.QMainWindow):
             center[0] += DX
             center[1] += DY
 
+            # Scale the figure
             if len(center) != 0:
                 self.ScaleFigure(center, input_scale)
             else:
@@ -649,6 +520,7 @@ class Window(QtWidgets.QMainWindow):
         # Draw figure
         self.DrawFigure()
 
+    # Draw the line
     def DrawLine(self, color, first_point, second_point):
 
         # Set the painter
@@ -664,6 +536,7 @@ class Window(QtWidgets.QMainWindow):
         self.GraphField.update()
         painter.end()
 
+    # Draw the circle
     def DrawCircle(self, color):
 
         # Set the painter
@@ -700,6 +573,7 @@ class Window(QtWidgets.QMainWindow):
         self.GraphField.update()
         painter.end()
 
+    # Draw the half ellipse
     def DrawHalfEllipse(self, color, radius_x, radius_y):
 
         # Set the painter
@@ -721,6 +595,7 @@ class Window(QtWidgets.QMainWindow):
                              self.coordinates["line"]["first_point"],
                              center)
 
+            # Check the angle
             if angle < 0 and \
                 self.coordinates["line"]["second_point"][1] < self.coordinates["line"]["first_point"][1] or \
                     angle > 0 and \
@@ -747,6 +622,7 @@ class Window(QtWidgets.QMainWindow):
         self.GraphField.update()
         painter.end()
 
+    # Back to the previous drawing
     def GoBack(self):
 
         # Get prev coordinates
@@ -754,6 +630,7 @@ class Window(QtWidgets.QMainWindow):
             self.DeleteGraph()
             return
         else:
+            # Copy the coordinates
             DeepCopy(self.coordinates, self.last_coordinates[-1])
             self.last_coordinates.pop()
 
@@ -763,6 +640,7 @@ class Window(QtWidgets.QMainWindow):
         # Draw figure
         self.DrawFigure()
 
+    # Clear the fields
     def DeleteAllFieldsData(self):
 
         # Clear center coordinates fields
@@ -780,12 +658,13 @@ class Window(QtWidgets.QMainWindow):
         self.ScaleXField.clear()
         self.ScaleYField.clear()
 
+    # Clear the graph
     def DeleteGraph(self):
 
-        # Clear the graph
         self.GraphField.pixmap().fill(QtCore.Qt.black)
         self.GraphField.update()
 
+    # Clear the graph and coordinates
     def DeleteGraphAndCoordinates(self):
 
         # Clear the field
@@ -796,6 +675,7 @@ class Window(QtWidgets.QMainWindow):
 
 
 if __name__ == "__main__":
+
     # Create the Qt Application
     app = QtWidgets.QApplication([])
     application = Window()
