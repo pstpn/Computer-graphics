@@ -3,7 +3,7 @@ import copy
 
 from PyQt5 import QtWidgets, QtCore, QtGui, uic
 from calculate import RotatePoint, ScalePoint, GetXYParams, GetDXLen, GetDYLen, GetCircleCenter, GetAngle
-from tools import ClearCoordinates, DeepCopy, ErrorDialog
+from tools import ClearCoordinates, DeepCopy, ErrorDialog, PrintTaskInfo, PrintAuthorInfo
 
 
 # Default coordinates
@@ -66,6 +66,9 @@ class Window(QtWidgets.QMainWindow):
         self.ClearGraph.clicked.connect(self.DeleteGraphAndCoordinates)
         self.ReturnToPrev.setShortcut("Ctrl+Z")
         self.ReturnToPrev.clicked.connect(self.GoBack)
+
+        self.AuthorInfo.triggered.connect(PrintAuthorInfo)
+        self.TaskInfo.triggered.connect(PrintTaskInfo)
 
         # Set the quit trigger
         self.Quit.setShortcut("Ctrl+D")
@@ -477,6 +480,11 @@ class Window(QtWidgets.QMainWindow):
             center, err = GetXYParams(self.CenterXField.toPlainText, self.CenterYField.toPlainText)
             if err == ValueError:
                 return
+            elif len(center) == 0:
+                ErrorDialog("Ошибка получения координат",
+                            "Координаты центра поворота/масштабирования не были заданы",
+                            "Ожидались вещественные значения\n")
+                return
 
             center[0] += DX
             center[1] += DY
@@ -500,6 +508,11 @@ class Window(QtWidgets.QMainWindow):
             # Get center
             center, err = GetXYParams(self.CenterXField.toPlainText, self.CenterYField.toPlainText)
             if err == ValueError:
+                return
+            elif len(center) == 0:
+                ErrorDialog("Ошибка получения координат",
+                            "Координаты центра поворота/масштабирования не были заданы",
+                            "Ожидались вещественные значения\n")
                 return
 
             center[0] += DX

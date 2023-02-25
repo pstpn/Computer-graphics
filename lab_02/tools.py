@@ -78,3 +78,42 @@ def ErrorDialog(title, name, info):
 
     # Show the message box
     msg.exec_()
+
+
+# Print information
+def PrintInfo(title, text):
+
+    # Create a message box
+    msg = QtWidgets.QMessageBox()
+    msg.setIcon(QtWidgets.QMessageBox.Information)
+
+    # Set the message box text
+    msg.setWindowTitle(title)
+    msg.setText(text)
+    msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+
+    # Show the message box
+    msg.exec_()
+
+
+# Print author information
+def PrintAuthorInfo():
+
+    PrintInfo(
+            "Информация об авторе",
+            "Задание выполнил Постнов Степан Андреевич,\n"
+            "студент группы ИУ7-41Б"
+    )
+
+
+# Print task information
+def PrintTaskInfo():
+
+    PrintInfo(
+            "Условие задания",
+            "Изобразить на экране данную фигуру\n"
+            "(2 квадрата, 1 окружность, 1 эллипс).\n"
+            "Реализовать возможность перемещения фигуры, \n"
+            "поворота и масштабирования.\n"
+
+    )

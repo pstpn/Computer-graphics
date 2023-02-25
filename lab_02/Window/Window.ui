@@ -358,6 +358,14 @@ font: 63 14pt &quot;URW Gothic&quot;;</string>
     </property>
     <addaction name="Quit"/>
    </widget>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Информация</string>
+    </property>
+    <addaction name="AuthorInfo"/>
+    <addaction name="TaskInfo"/>
+   </widget>
+   <addaction name="menu"/>
    <addaction name="menu_2"/>
   </widget>
   <action name="ClearAll">
@@ -386,6 +394,16 @@ font: 63 14pt &quot;URW Gothic&quot;;</string>
   <action name="Finding">
    <property name="text">
     <string>Найти четырехугольники</string>
+   </property>
+  </action>
+  <action name="AuthorInfo">
+   <property name="text">
+    <string>Об авторе</string>
+   </property>
+  </action>
+  <action name="TaskInfo">
+   <property name="text">
+    <string>О программе</string>
    </property>
   </action>
  </widget>
