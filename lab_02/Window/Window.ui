@@ -23,7 +23,7 @@ font: 63 13pt &quot;URW Gothic&quot;;</string>
     <property name="geometry">
      <rect>
       <x>960</x>
-      <y>690</y>
+      <y>710</y>
       <width>501</width>
       <height>111</height>
      </rect>
@@ -285,15 +285,15 @@ color: rgb(243, 243, 243);
 font: 63 14pt &quot;URW Gothic&quot;;</string>
     </property>
     <property name="text">
-     <string>Угол поворота фигуры относительно центра:</string>
+     <string>Угол поворота фигуры относительно центра поворота:</string>
     </property>
    </widget>
-   <widget class="QPlainTextEdit" name="ScalingField">
+   <widget class="QPlainTextEdit" name="ScaleXField">
     <property name="geometry">
      <rect>
       <x>940</x>
       <y>590</y>
-      <width>541</width>
+      <width>261</width>
       <height>41</height>
      </rect>
     </property>
@@ -303,7 +303,7 @@ color: rgb(243, 243, 243);
 font: 63 14pt &quot;URW Gothic&quot;;</string>
     </property>
     <property name="placeholderText">
-     <string>Действительное число</string>
+     <string>По оси Ox</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_4">
@@ -321,7 +321,25 @@ color: rgb(243, 243, 243);
 font: 63 14pt &quot;URW Gothic&quot;;</string>
     </property>
     <property name="text">
-     <string>Коэффициент масштабирования:</string>
+     <string>Коэффициент масштабирования по оси Ox и оси Oy:</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="ScaleYField">
+    <property name="geometry">
+     <rect>
+      <x>1220</x>
+      <y>590</y>
+      <width>261</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="placeholderText">
+     <string>По оси Oy</string>
     </property>
    </widget>
   </widget>
@@ -331,7 +349,7 @@ font: 63 14pt &quot;URW Gothic&quot;;</string>
      <x>0</x>
      <y>0</y>
      <width>1498</width>
-     <height>31</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_2">
