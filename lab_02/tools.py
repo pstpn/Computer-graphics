@@ -22,16 +22,24 @@ def DeepCopy(dst, src):
     dst["ellipse"]["points"] = src["ellipse"]["points"].copy()
 
     # Copy left quadrilateral coordinates
-    dst["left_quad"]["first_side"]["first_point"] = \
-        src["left_quad"]["first_side"]["first_point"].copy()
-    dst["left_quad"]["first_side"]["second_point"] = \
-        src["left_quad"]["first_side"]["second_point"].copy()
+    dst["left_quad"]["first_point"] = \
+        src["left_quad"]["first_point"].copy()
+    dst["left_quad"]["second_point"] = \
+        src["left_quad"]["second_point"].copy()
+    dst["left_quad"]["third_point"] = \
+        src["left_quad"]["third_point"].copy()
+    dst["left_quad"]["fourth_point"] = \
+        src["left_quad"]["fourth_point"].copy()
 
     # Copy right quadrilateral coordinates
-    dst["right_quad"]["first_side"]["first_point"] = \
-        src["right_quad"]["first_side"]["first_point"].copy()
-    dst["right_quad"]["first_side"]["second_point"] = \
-        src["right_quad"]["first_side"]["second_point"].copy()
+    dst["right_quad"]["first_point"] = \
+        src["right_quad"]["first_point"].copy()
+    dst["right_quad"]["second_point"] = \
+        src["right_quad"]["second_point"].copy()
+    dst["right_quad"]["third_point"] = \
+        src["right_quad"]["third_point"].copy()
+    dst["right_quad"]["fourth_point"] = \
+        src["right_quad"]["fourth_point"].copy()
 
 
 # Function for clearing coordinates

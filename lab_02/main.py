@@ -1,5 +1,6 @@
 import sys
 import copy
+import math
 
 from PyQt5 import QtWidgets, QtCore, QtGui, uic
 from calculate import RotatePoint, ScalePoint, GetXYParams, GetDXLen, GetDYLen, GetCircleCenter, GetAngle
@@ -26,16 +27,16 @@ default_coordinates = {
         "points": []
     },
     "left_quad": {
-        "first_side": {
-            "first_point": [350, 410],
-            "second_point": [450, 277]
-        }
+        "first_point": [350, 410],
+        "second_point": [450, 277],
+        "third_point": [317, 177],
+        "fourth_point": [217, 310]
     },
     "right_quad": {
-        "first_side": {
-            "first_point": [550, 410],
-            "second_point": [450, 277]
-        }
+        "first_point": [550, 410],
+        "second_point": [450, 277],
+        "third_point": [583, 177],
+        "fourth_point": [683, 310]
     }
 }
 
@@ -94,16 +95,16 @@ class Window(QtWidgets.QMainWindow):
                 "points": []
             },
             "left_quad": {
-                "first_side": {
-                    "first_point": [],
-                    "second_point": []
-                }
+                "first_point": [],
+                "second_point": [],
+                "third_point": [],
+                "fourth_point": []
             },
             "right_quad": {
-                "first_side": {
-                    "first_point": [],
-                    "second_point": []
-                }
+                "first_point": [],
+                "second_point": [],
+                "third_point": [],
+                "fourth_point": []
             }
         }
 
@@ -153,53 +154,39 @@ class Window(QtWidgets.QMainWindow):
 
         # Draw left quadrilateral
         self.DrawLine(colors[1],
-                      self.coordinates["left_quad"]["first_side"]["first_point"],
-                      self.coordinates["left_quad"]["first_side"]["second_point"])
+                      self.coordinates["left_quad"]["first_point"],
+                      self.coordinates["left_quad"]["second_point"])
 
         self.DrawLine(colors[1],
-                      self.coordinates["left_quad"]["first_side"]["second_point"],
-                      RotatePoint(self.coordinates["left_quad"]["first_side"]["second_point"],
-                                  self.coordinates["left_quad"]["first_side"]["first_point"],
-                                  -90))
+                      self.coordinates["left_quad"]["second_point"],
+                      self.coordinates["left_quad"]["third_point"])
 
         self.DrawLine(colors[1],
-                      self.coordinates["left_quad"]["first_side"]["first_point"],
-                      RotatePoint(self.coordinates["left_quad"]["first_side"]["first_point"],
-                                  self.coordinates["left_quad"]["first_side"]["second_point"],
-                                  90))
+                      self.coordinates["left_quad"]["third_point"],
+                      self.coordinates["left_quad"]["fourth_point"])
 
         self.DrawLine(colors[1],
-                      RotatePoint(self.coordinates["left_quad"]["first_side"]["first_point"],
-                                  self.coordinates["left_quad"]["first_side"]["second_point"],
-                                  90),
-                      RotatePoint(self.coordinates["left_quad"]["first_side"]["second_point"],
-                                  self.coordinates["left_quad"]["first_side"]["first_point"],
-                                  -90))
+                      self.coordinates["left_quad"]["fourth_point"],
+                      self.coordinates["left_quad"]["first_point"]
+                      )
 
         # Draw right quadrilateral
         self.DrawLine(colors[1],
-                      self.coordinates["right_quad"]["first_side"]["first_point"],
-                      self.coordinates["right_quad"]["first_side"]["second_point"])
+                      self.coordinates["right_quad"]["first_point"],
+                      self.coordinates["right_quad"]["second_point"])
 
         self.DrawLine(colors[1],
-                      self.coordinates["right_quad"]["first_side"]["second_point"],
-                      RotatePoint(self.coordinates["right_quad"]["first_side"]["second_point"],
-                                  self.coordinates["right_quad"]["first_side"]["first_point"],
-                                  90))
+                      self.coordinates["right_quad"]["second_point"],
+                      self.coordinates["right_quad"]["third_point"])
 
         self.DrawLine(colors[1],
-                      self.coordinates["right_quad"]["first_side"]["first_point"],
-                      RotatePoint(self.coordinates["right_quad"]["first_side"]["first_point"],
-                                  self.coordinates["right_quad"]["first_side"]["second_point"],
-                                  -90))
+                      self.coordinates["right_quad"]["third_point"],
+                      self.coordinates["right_quad"]["fourth_point"])
 
         self.DrawLine(colors[1],
-                      RotatePoint(self.coordinates["right_quad"]["first_side"]["first_point"],
-                                  self.coordinates["right_quad"]["first_side"]["second_point"],
-                                  -90),
-                      RotatePoint(self.coordinates["right_quad"]["first_side"]["second_point"],
-                                  self.coordinates["right_quad"]["first_side"]["first_point"],
-                                  90))
+                      self.coordinates["right_quad"]["fourth_point"],
+                      self.coordinates["right_quad"]["first_point"]
+                      )
 
     # Transfer figure
     def TransferFigure(self, shift):
@@ -255,15 +242,23 @@ class Window(QtWidgets.QMainWindow):
     # Transfer the quad
     def TransferQuad(self, shift):
 
-        self.coordinates["left_quad"]["first_side"]["first_point"][0] += shift[0]
-        self.coordinates["left_quad"]["first_side"]["first_point"][1] -= shift[1]
-        self.coordinates["left_quad"]["first_side"]["second_point"][0] += shift[0]
-        self.coordinates["left_quad"]["first_side"]["second_point"][1] -= shift[1]
+        self.coordinates["left_quad"]["first_point"][0] += shift[0]
+        self.coordinates["left_quad"]["first_point"][1] -= shift[1]
+        self.coordinates["left_quad"]["second_point"][0] += shift[0]
+        self.coordinates["left_quad"]["second_point"][1] -= shift[1]
+        self.coordinates["left_quad"]["third_point"][0] += shift[0]
+        self.coordinates["left_quad"]["third_point"][1] -= shift[1]
+        self.coordinates["left_quad"]["fourth_point"][0] += shift[0]
+        self.coordinates["left_quad"]["fourth_point"][1] -= shift[1]
 
-        self.coordinates["right_quad"]["first_side"]["first_point"][0] += shift[0]
-        self.coordinates["right_quad"]["first_side"]["first_point"][1] -= shift[1]
-        self.coordinates["right_quad"]["first_side"]["second_point"][0] += shift[0]
-        self.coordinates["right_quad"]["first_side"]["second_point"][1] -= shift[1]
+        self.coordinates["right_quad"]["first_point"][0] += shift[0]
+        self.coordinates["right_quad"]["first_point"][1] -= shift[1]
+        self.coordinates["right_quad"]["second_point"][0] += shift[0]
+        self.coordinates["right_quad"]["second_point"][1] -= shift[1]
+        self.coordinates["right_quad"]["third_point"][0] += shift[0]
+        self.coordinates["right_quad"]["third_point"][1] -= shift[1]
+        self.coordinates["right_quad"]["fourth_point"][0] += shift[0]
+        self.coordinates["right_quad"]["fourth_point"][1] -= shift[1]
 
     # Rotate figure
     def RotateFigure(self, center, angle):
@@ -321,15 +316,23 @@ class Window(QtWidgets.QMainWindow):
     # Rotate the quad
     def RotateQuad(self, center, angle):
 
-        self.coordinates["left_quad"]["first_side"]["first_point"] = \
-            RotatePoint(center, self.coordinates["left_quad"]["first_side"]["first_point"], angle)
-        self.coordinates["left_quad"]["first_side"]["second_point"] = \
-            RotatePoint(center, self.coordinates["left_quad"]["first_side"]["second_point"], angle)
+        self.coordinates["left_quad"]["first_point"] = \
+            RotatePoint(center, self.coordinates["left_quad"]["first_point"], angle)
+        self.coordinates["left_quad"]["second_point"] = \
+            RotatePoint(center, self.coordinates["left_quad"]["second_point"], angle)
+        self.coordinates["left_quad"]["third_point"] = \
+            RotatePoint(center, self.coordinates["left_quad"]["third_point"], angle)
+        self.coordinates["left_quad"]["fourth_point"] = \
+            RotatePoint(center, self.coordinates["left_quad"]["fourth_point"], angle)
 
-        self.coordinates["right_quad"]["first_side"]["first_point"] = \
-            RotatePoint(center, self.coordinates["right_quad"]["first_side"]["first_point"], angle)
-        self.coordinates["right_quad"]["first_side"]["second_point"] = \
-            RotatePoint(center, self.coordinates["right_quad"]["first_side"]["second_point"], angle)
+        self.coordinates["right_quad"]["first_point"] = \
+            RotatePoint(center, self.coordinates["right_quad"]["first_point"], angle)
+        self.coordinates["right_quad"]["second_point"] = \
+            RotatePoint(center, self.coordinates["right_quad"]["second_point"], angle)
+        self.coordinates["right_quad"]["third_point"] = \
+            RotatePoint(center, self.coordinates["right_quad"]["third_point"], angle)
+        self.coordinates["right_quad"]["fourth_point"] = \
+            RotatePoint(center, self.coordinates["right_quad"]["fourth_point"], angle)
 
     # Scale figure
     def ScaleFigure(self, center, scale):
@@ -393,15 +396,26 @@ class Window(QtWidgets.QMainWindow):
     # Scale the quad
     def ScaleQuad(self, center, scale):
 
-        self.coordinates["left_quad"]["first_side"]["first_point"] = \
-            ScalePoint(center, self.coordinates["left_quad"]["first_side"]["first_point"], scale)
-        self.coordinates["left_quad"]["first_side"]["second_point"] = \
-            ScalePoint(center, self.coordinates["left_quad"]["first_side"]["second_point"], scale)
+        if math.fabs(scale[0]) < 1e-8 or math.fabs(scale[1]) < 1e-8:
+            scale = [0, 0]
 
-        self.coordinates["right_quad"]["first_side"]["first_point"] = \
-            ScalePoint(center, self.coordinates["right_quad"]["first_side"]["first_point"], scale)
-        self.coordinates["right_quad"]["first_side"]["second_point"] = \
-            ScalePoint(center, self.coordinates["right_quad"]["first_side"]["second_point"], scale)
+        self.coordinates["left_quad"]["first_point"] = \
+            ScalePoint(center, self.coordinates["left_quad"]["first_point"], scale)
+        self.coordinates["left_quad"]["second_point"] = \
+            ScalePoint(center, self.coordinates["left_quad"]["second_point"], scale)
+        self.coordinates["left_quad"]["third_point"] = \
+            ScalePoint(center, self.coordinates["left_quad"]["third_point"], scale)
+        self.coordinates["left_quad"]["fourth_point"] = \
+            ScalePoint(center, self.coordinates["left_quad"]["fourth_point"], scale)
+
+        self.coordinates["right_quad"]["first_point"] = \
+            ScalePoint(center, self.coordinates["right_quad"]["first_point"], scale)
+        self.coordinates["right_quad"]["second_point"] = \
+            ScalePoint(center, self.coordinates["right_quad"]["second_point"], scale)
+        self.coordinates["right_quad"]["third_point"] = \
+            ScalePoint(center, self.coordinates["right_quad"]["third_point"], scale)
+        self.coordinates["right_quad"]["fourth_point"] = \
+            ScalePoint(center, self.coordinates["right_quad"]["fourth_point"], scale)
 
     # Get input angle
     def GetAngle(self):
