@@ -43,8 +43,8 @@ default_coordinates = {
 # Transfers coordinates to the coordinate system of the canvas
 DX, DY = 450, 360
 
-# Colors code: red, purple, yellow
-colors = ["#FF0000", "#800080", "#FFFF00"]
+# Colors code: cian, blue, yellow, green
+colors = ["#0000FF", "#2DC3CE", "#FFFF00", "#15EB5C"]
 
 
 # Main window class
@@ -62,7 +62,9 @@ class Window(QtWidgets.QMainWindow):
         # Set the buttons
         self.ClearAllFields.setShortcut("Ctrl+W")
         self.ClearAllFields.clicked.connect(self.DeleteAllFieldsData)
-        self.ExecTrans.clicked.connect(self.ExecTransFigure)
+        self.ExecTransfer.clicked.connect(self.TransferFigure)
+        self.ExecRotate.clicked.connect(self.RotateFigure)
+        self.ExecScaling.clicked.connect(self.ScaleFigure)
         self.DrawInitFigure.clicked.connect(self.InitDrawFigure)
         self.ClearGraph.clicked.connect(self.DeleteGraphAndCoordinates)
         self.ReturnToPrev.setShortcut("Ctrl+Z")
@@ -143,7 +145,7 @@ class Window(QtWidgets.QMainWindow):
         self.DrawCircle(colors[0])
 
         # Draw line
-        self.DrawLine(colors[1],
+        self.DrawLine(colors[3],
                       self.coordinates["line"]["first_point"],
                       self.coordinates["line"]["second_point"])
 
@@ -189,7 +191,7 @@ class Window(QtWidgets.QMainWindow):
                       )
 
     # Transfer figure
-    def TransferFigure(self, shift):
+    def TransferFigure(self):
 
         # Check if the figure was drawn
         if len(self.coordinates) == 0:
@@ -198,17 +200,42 @@ class Window(QtWidgets.QMainWindow):
                         "")
             return
 
-        # Transfer the circle
-        self.TransferCircle(shift)
+        # Check if the figure was drawn
+        if len(self.coordinates["circle"]["first_point"]) == 0:
+            ErrorDialog("Ошибка трансформации фигуры",
+                        "Невозможно трансформировать фигуру, так как она не была нарисована",
+                        "")
+            return
 
-        # Transfer the half ellipse
-        self.TransferHalfEllipse(shift)
+        # Get shift
+        shift, err = GetXYParams(self.OffsetXField.toPlainText, self.OffsetYField.toPlainText)
+        if err == ValueError:
+            return
 
-        # Transfer the line
-        self.TransferLine(shift)
+        # Shift the figure
+        if len(shift) != 0:
+            # Save the coordinates
+            self.last_coordinates.append(copy.deepcopy(self.coordinates))
 
-        # Transfer the quad
-        self.TransferQuad(shift)
+            # Transfer the circle
+            self.TransferCircle(shift)
+
+            # Transfer the half ellipse
+            self.TransferHalfEllipse(shift)
+
+            # Transfer the line
+            self.TransferLine(shift)
+
+            # Transfer the quad
+            self.TransferQuad(shift)
+        else:
+            return
+
+        # Clear the field
+        self.DeleteGraph()
+
+        # Draw figure
+        self.DrawFigure()
 
     # Transfer the circle
     def TransferCircle(self, shift):
@@ -261,7 +288,7 @@ class Window(QtWidgets.QMainWindow):
         self.coordinates["right_quad"]["fourth_point"][1] -= shift[1]
 
     # Rotate figure
-    def RotateFigure(self, center, angle):
+    def RotateFigure(self):
 
         # Check if the figure was drawn
         if len(self.coordinates) == 0:
@@ -270,17 +297,62 @@ class Window(QtWidgets.QMainWindow):
                         "")
             return
 
-        # Rotate the circle
-        self.RotateCircle(center, angle)
+        # Check if the figure was drawn
+        if len(self.coordinates["circle"]["first_point"]) == 0:
+            ErrorDialog("Ошибка трансформации фигуры",
+                        "Невозможно трансформировать фигуру, так как она не была нарисована",
+                        "")
+            return
 
-        # Rotate the half ellipse
-        self.RotateHalfEllipse(center, angle)
+        # Get input angle
+        input_angle, is_correct = self.GetAngle()
+        if is_correct is not True and input_angle == -1:
+            return
 
-        # Rotate the line
-        self.RotateLine(center, angle)
+        if is_correct is True:
 
-        # Rotate the quad
-        self.RotateQuad(center, angle)
+            # Get center
+            center, err = GetXYParams(self.CenterXField.toPlainText, self.CenterYField.toPlainText)
+            if err == ValueError:
+                return
+            elif len(center) == 0:
+                ErrorDialog("Ошибка получения координат",
+                            "Координаты центра поворота/масштабирования не были заданы",
+                            "Ожидались вещественные значения\n")
+                return
+
+            center[0] += DX
+            center[1] += DY
+
+            # Rotate the figure
+            if len(center) != 0:
+                # Save the coordinates
+                self.last_coordinates.append(copy.deepcopy(self.coordinates))
+
+                # Rotate the circle
+                self.RotateCircle(center, input_angle)
+
+                # Rotate the half ellipse
+                self.RotateHalfEllipse(center, input_angle)
+
+                # Rotate the line
+                self.RotateLine(center, input_angle)
+
+                # Rotate the quad
+                self.RotateQuad(center, input_angle)
+            else:
+                ErrorDialog("Ошибка получения координат",
+                            "Координаты центра поворота/масштабирования не были заданы",
+                            "Ожидались целые величины\n")
+                return
+        else:
+            return
+
+        # Clear the field
+        self.DeleteGraph()
+
+        # Draw figure
+        self.DrawFigure()
 
     # Rotate the circle
     def RotateCircle(self, center, angle):
@@ -335,7 +407,7 @@ class Window(QtWidgets.QMainWindow):
             RotatePoint(center, self.coordinates["right_quad"]["fourth_point"], angle)
 
     # Scale figure
-    def ScaleFigure(self, center, scale):
+    def ScaleFigure(self):
 
         # Check if the figure was drawn
         if len(self.coordinates) == 0:
@@ -344,17 +416,62 @@ class Window(QtWidgets.QMainWindow):
                         "")
             return
 
-        # Scale the circle
-        self.ScaleCircle(center, scale)
+        # Check if the figure was drawn
+        if len(self.coordinates["circle"]["first_point"]) == 0:
+            ErrorDialog("Ошибка трансформации фигуры",
+                        "Невозможно трансформировать фигуру, так как она не была нарисована",
+                        "")
+            return
 
-        # Scale the half ellipse
-        self.ScaleHalfEllipse(center, scale)
+        # Get input scale
+        input_scale, is_correct = self.GetScale()
+        if is_correct is not True and len(input_scale) == 0:
+            return
 
-        # Scale the line
-        self.ScaleLine(center, scale)
+        if is_correct is True:
 
-        # Scale the quad
-        self.ScaleQuad(center, scale)
+            # Get center
+            center, err = GetXYParams(self.CenterXField.toPlainText, self.CenterYField.toPlainText)
+            if err == ValueError:
+                return
+            elif len(center) == 0:
+                ErrorDialog("Ошибка получения координат",
+                            "Координаты центра поворота/масштабирования не были заданы",
+                            "Ожидались вещественные значения\n")
+                return
+
+            center[0] += DX
+            center[1] += DY
+
+            # Scale the figure
+            if len(center) != 0:
+                # Save the coordinates
+                self.last_coordinates.append(copy.deepcopy(self.coordinates))
+
+                # Scale the circle
+                self.ScaleCircle(center, input_scale)
+
+                # Scale the half ellipse
+                self.ScaleHalfEllipse(center, input_scale)
+
+                # Scale the line
+                self.ScaleLine(center, input_scale)
+
+                # Scale the quad
+                self.ScaleQuad(center, input_scale)
+            else:
+                ErrorDialog("Ошибка получения координат",
+                            "Координаты центра поворота/масштабирования не были заданы",
+                            "Ожидались целые величины\n")
+                return
+        else:
+            return
+
+        # Clear the field
+        self.DeleteGraph()
+
+        # Draw figure
+        self.DrawFigure()
 
     # Scale the circle
     def ScaleCircle(self, center, scale):
@@ -460,92 +577,6 @@ class Window(QtWidgets.QMainWindow):
             return [], False
 
         return [f_scale_x, f_scale_y], True
-
-    # Execute transformation of the figure
-    def ExecTransFigure(self):
-
-        # Check if the figure was drawn
-        if len(self.coordinates["circle"]["first_point"]) == 0:
-            ErrorDialog("Ошибка трансформации фигуры",
-                        "Невозможно трансформировать фигуру, так как она не была нарисована",
-                        "")
-            return
-
-        # Save the coordinates
-        self.last_coordinates.append(copy.deepcopy(self.coordinates))
-
-        # Get shift
-        shift, err = GetXYParams(self.OffsetXField.toPlainText, self.OffsetYField.toPlainText)
-        if err == ValueError:
-            return
-
-        # Shift the figure
-        if len(shift) != 0:
-            self.TransferFigure(shift)
-
-        # Get input angle
-        input_angle, is_correct = self.GetAngle()
-        if is_correct is not True and input_angle == -1:
-            return
-
-        if is_correct is True:
-
-            # Get center
-            center, err = GetXYParams(self.CenterXField.toPlainText, self.CenterYField.toPlainText)
-            if err == ValueError:
-                return
-            elif len(center) == 0:
-                ErrorDialog("Ошибка получения координат",
-                            "Координаты центра поворота/масштабирования не были заданы",
-                            "Ожидались вещественные значения\n")
-                return
-
-            center[0] += DX
-            center[1] += DY
-
-            # Rotate the figure
-            if len(center) != 0:
-                self.RotateFigure(center, input_angle)
-            else:
-                ErrorDialog("Ошибка получения координат",
-                            "Координаты центра поворота/масштабирования не были заданы",
-                            "Ожидались целые величины\n")
-                return
-
-        # Get input scale
-        input_scale, is_correct = self.GetScale()
-        if is_correct is not True and len(input_scale) == 0:
-            return
-
-        if is_correct is True:
-
-            # Get center
-            center, err = GetXYParams(self.CenterXField.toPlainText, self.CenterYField.toPlainText)
-            if err == ValueError:
-                return
-            elif len(center) == 0:
-                ErrorDialog("Ошибка получения координат",
-                            "Координаты центра поворота/масштабирования не были заданы",
-                            "Ожидались вещественные значения\n")
-                return
-
-            center[0] += DX
-            center[1] += DY
-
-            # Scale the figure
-            if len(center) != 0:
-                self.ScaleFigure(center, input_scale)
-            else:
-                ErrorDialog("Ошибка получения координат",
-                            "Координаты центра поворота/масштабирования не были заданы",
-                            "Ожидались целые величины\n")
-                return
-
-        # Clear the field
-        self.DeleteGraph()
-
-        # Draw figure
-        self.DrawFigure()
 
     # Draw the line
     def DrawLine(self, color, first_point, second_point):
