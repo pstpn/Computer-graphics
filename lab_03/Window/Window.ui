@@ -1,0 +1,501 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1532</width>
+    <height>898</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 13pt &quot;URW Gothic&quot;;</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QLabel" name="GraphField">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>110</y>
+      <width>900</width>
+      <height>720</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>16777215</width>
+      <height>16777215</height>
+     </size>
+    </property>
+    <property name="acceptDrops">
+     <bool>false</bool>
+    </property>
+    <property name="toolTip">
+     <string/>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ClearGraph">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>911</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Очистить граф. поле</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>940</x>
+      <y>10</y>
+      <width>561</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Цвет линий:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>940</x>
+      <y>200</y>
+      <width>561</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Алгоритм построения:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="DrawLine">
+    <property name="geometry">
+     <rect>
+      <x>930</x>
+      <y>540</y>
+      <width>581</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Построить отрезок</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="X1Field">
+    <property name="geometry">
+     <rect>
+      <x>930</x>
+      <y>440</y>
+      <width>251</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="placeholderText">
+     <string>X1</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="Y1Field">
+    <property name="geometry">
+     <rect>
+      <x>1260</x>
+      <y>440</y>
+      <width>251</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="placeholderText">
+     <string>Y1</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>940</x>
+      <y>390</y>
+      <width>561</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Построение отрезка:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="X2Field">
+    <property name="geometry">
+     <rect>
+      <x>930</x>
+      <y>490</y>
+      <width>251</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="placeholderText">
+     <string>X2</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="Y2Field">
+    <property name="geometry">
+     <rect>
+      <x>1260</x>
+      <y>490</y>
+      <width>251</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="placeholderText">
+     <string>Y2</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>930</x>
+      <y>610</y>
+      <width>571</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Построение спектра:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="AngleField">
+    <property name="geometry">
+     <rect>
+      <x>930</x>
+      <y>660</y>
+      <width>251</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="placeholderText">
+     <string>Угол поворота</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="LenField">
+    <property name="geometry">
+     <rect>
+      <x>1260</x>
+      <y>660</y>
+      <width>251</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="placeholderText">
+     <string>Длина отрезка</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="DrawSpectr">
+    <property name="geometry">
+     <rect>
+      <x>930</x>
+      <y>710</y>
+      <width>581</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Построить спектр</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="TimeCompare">
+    <property name="geometry">
+     <rect>
+      <x>930</x>
+      <y>780</y>
+      <width>261</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Сравнение времени</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="SteppingCompare">
+    <property name="geometry">
+     <rect>
+      <x>1210</x>
+      <y>780</y>
+      <width>301</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Сравнение ступенчатости</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>930</x>
+      <y>40</y>
+      <width>581</width>
+      <height>141</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="Colors">
+     <item row="0" column="0">
+      <widget class="QRadioButton" name="BlueColor">
+       <property name="text">
+        <string>Синий</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QRadioButton" name="PurpleColor">
+       <property name="text">
+        <string>Фиолетовый</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QRadioButton" name="RedColor">
+       <property name="text">
+        <string>Красный</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QRadioButton" name="WhiteColor">
+       <property name="text">
+        <string>Белый</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QRadioButton" name="GreenColor">
+       <property name="text">
+        <string>Зеленый</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QRadioButton" name="YellowColor">
+       <property name="text">
+        <string>Желтый</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>930</x>
+      <y>250</y>
+      <width>581</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="Algs">
+     <item row="0" column="0">
+      <widget class="QRadioButton" name="DDAAlg">
+       <property name="text">
+        <string>ЦДА</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QRadioButton" name="BresIntAlg">
+       <property name="text">
+        <string>Брезенхем (int)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QRadioButton" name="WUAlg">
+       <property name="text">
+        <string>Ву</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QRadioButton" name="BresFloatAlg">
+       <property name="text">
+        <string>Брезенхем (float)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QRadioButton" name="LibAlg">
+       <property name="text">
+        <string>Библ. функция</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QRadioButton" name="BresAntiAlg">
+       <property name="text">
+        <string>Брезенхем (без ступ.)</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1532</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>Выход</string>
+    </property>
+    <addaction name="Quit"/>
+   </widget>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Информация</string>
+    </property>
+    <addaction name="AuthorInfo"/>
+    <addaction name="TaskInfo"/>
+   </widget>
+   <addaction name="menu"/>
+   <addaction name="menu_2"/>
+  </widget>
+  <action name="ClearAll">
+   <property name="text">
+    <string>Очистить все поля</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>URW Bookman</family>
+     <weight>75</weight>
+     <italic>false</italic>
+     <bold>true</bold>
+    </font>
+   </property>
+  </action>
+  <action name="Quit">
+   <property name="text">
+    <string>Выход</string>
+   </property>
+  </action>
+  <action name="ClearAll_2">
+   <property name="text">
+    <string>Очистить все</string>
+   </property>
+  </action>
+  <action name="Finding">
+   <property name="text">
+    <string>Найти четырехугольники</string>
+   </property>
+  </action>
+  <action name="AuthorInfo">
+   <property name="text">
+    <string>Об авторе</string>
+   </property>
+  </action>
+  <action name="TaskInfo">
+   <property name="text">
+    <string>О программе</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
