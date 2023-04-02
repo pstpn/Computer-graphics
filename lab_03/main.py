@@ -2,83 +2,12 @@ from PyQt5 import uic
 from matplotlib import pyplot as plt
 from time import time
 from tools import *
+from paint import PaintWidget
 
 import math
 import sys
 
 runs_count = 30
-
-
-class PaintWidget(QtWidgets.QWidget):
-    def __init__(self, parent):
-
-        super().__init__(parent)
-
-        self.qp = QtGui.QPainter()
-
-        self.setFixedSize(900, 720)
-
-        self.lineColor = None
-        self.backgroundColor = None
-
-        self.setLineColor()
-        self.setBackgroundColor()
-
-        self.lines = []
-        self.spectra = []
-
-    def setLineColor(self, color=QtGui.QColor(0, 0, 0)):
-        self.lineColor = color
-
-    def setBackgroundColor(self, color=QtGui.QColor(255, 255, 255)):
-        self.backgroundColor = color
-
-    def paintEvent(self, event: QtGui.QPaintEvent):
-
-        self.qp.begin(self)
-
-        # Clear the field
-        self.qp.fillRect(0, 0, self.width(), self.height(), self.backgroundColor)
-
-        if self.lines:
-            for line in self.lines:
-                self.drawLine(line)
-
-        if self.spectra:
-            for spectrum in self.spectra:
-                self.drawSpectrum(spectrum)
-
-        self.qp.end()
-
-    def drawLine(self, points):
-
-        # Draw using library function
-        if points[-1]:
-            self.qp.setPen(QtGui.QPen(self.backgroundColor, 1))
-            self.qp.drawLine(int(points[0][0]), int(points[0][1]),
-                             int(points[1][0]), int(points[1][1]))
-            self.qp.setPen(QtGui.QPen(self.lineColor, 1))
-            self.qp.drawLine(int(points[0][0]), int(points[0][1]),
-                             int(points[1][0]), int(points[1][1]))
-        else:
-            for point in points[:-1]:
-                self.qp.setPen(QtGui.QPen(self.backgroundColor, 1))
-                self.qp.drawPoint(int(point[0]), int(point[1]))
-                color = GetQColor(point[2])
-                self.qp.setPen(QtGui.QPen(color, 1))
-                self.qp.drawPoint(int(point[0]), int(point[1]))
-
-    def drawSpectrum(self, spectra: list):
-
-        for line in spectra:
-            self.drawLine(line)
-
-    def clear(self):
-
-        self.lines = []
-        self.spectra = []
-
-        self.update()
 
 
 # Main window class
@@ -184,10 +113,10 @@ class Window(QtWidgets.QMainWindow):
             ErrorDialog("Ошибка", "Ошибка ввода", "Не все поля заполнены!")
             return
         try:
-            first_point[0] = int(first_point[0])
-            first_point[1] = int(first_point[1])
-            second_point[0] = int(second_point[0])
-            second_point[1] = int(second_point[1])
+            first_point[0] = float(first_point[0])
+            first_point[1] = float(first_point[1])
+            second_point[0] = float(second_point[0])
+            second_point[1] = float(second_point[1])
         except ValueError:
             ErrorDialog("Ошибка", "Ошибка ввода", "Введены некорректные координаты!")
             return
@@ -235,8 +164,8 @@ class Window(QtWidgets.QMainWindow):
             return
 
         try:
-            center[0] = int(center[0])
-            center[1] = int(center[1])
+            center[0] = float(center[0])
+            center[1] = float(center[1])
             length = float(length)
             angle = float(angle)
         except ValueError:
@@ -297,8 +226,8 @@ class Window(QtWidgets.QMainWindow):
             return
 
         try:
-            center[0] = int(center[0])
-            center[1] = int(center[1])
+            center[0] = float(center[0])
+            center[1] = float(center[1])
             length = float(length)
             angle = float(angle)
         except ValueError:
@@ -369,8 +298,8 @@ class Window(QtWidgets.QMainWindow):
             return
 
         try:
-            center[0] = int(center[0])
-            center[1] = int(center[1])
+            center[0] = float(center[0])
+            center[1] = float(center[1])
             length = float(length)
         except ValueError:
             ErrorDialog("Ошибка", "Ошибка замеров", "Введены некорректные данные!")
