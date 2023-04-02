@@ -1,8 +1,12 @@
 from PyQt5 import uic
+from matplotlib import pyplot as plt
+from time import time
 from tools import *
-import math
 
+import math
 import sys
+
+runs_count = 30
 
 
 class PaintWidget(QtWidgets.QWidget):
@@ -116,6 +120,8 @@ class Window(QtWidgets.QMainWindow):
         # Set the buttons
         self.DrawLine.clicked.connect(self.DrawingLine)
         self.DrawSpectrum.clicked.connect(self.DrawingSpectrum)
+        self.TimeCompare.clicked.connect(self.TimeComparing)
+        self.SteppingCompare.clicked.connect(self.SteppingComparing)
         self.ClearGraph.clicked.connect(self.DeleteGraph)
 
         self.AuthorInfo.triggered.connect(PrintAuthorInfo)
@@ -227,6 +233,7 @@ class Window(QtWidgets.QMainWindow):
         if center[0] == "" or center[1] == "" or length == "" or angle == "":
             ErrorDialog("Ошибка", "Ошибка ввода", "Не все поля заполнены!")
             return
+
         try:
             center[0] = int(center[0])
             center[1] = int(center[1])
@@ -242,7 +249,6 @@ class Window(QtWidgets.QMainWindow):
 
         # Draw the spectra
         while current_angle < 360:
-
             # Get points
             points, is_lib_alg = GetAlgorithmPoints(self,
                                                     center[0], center[1],
@@ -261,6 +267,151 @@ class Window(QtWidgets.QMainWindow):
         self.paintWidget.spectra.append(current_spectrum)
         self.paintWidget.update()
 
+    # Compare the time
+    def TimeComparing(self):
+
+        # Get the lines color
+        line_color = GetLineColor(self)
+
+        # Get the background color
+        background_color = GetBackgroundColor(self)
+
+        # Set line color
+        self.paintWidget.setLineColor(QtGui.QColor(line_color[0], line_color[1], line_color[2]))
+
+        # Set background color
+        self.paintWidget.setBackgroundColor(QtGui.QColor(background_color[0], background_color[1], background_color[2]))
+
+        # Get the center
+        center = [self.CenterX.toPlainText(), self.CenterY.toPlainText()]
+
+        # Get the length
+        length = self.LenField.toPlainText()
+
+        # Get the angle
+        angle = self.AngleField.toPlainText()
+
+        # Check the input data
+        if center[0] == "" or center[1] == "" or length == "" or angle == "":
+            ErrorDialog("Ошибка", "Ошибка замеров", "Не все поля заполнены!")
+            return
+
+        try:
+            center[0] = int(center[0])
+            center[1] = int(center[1])
+            length = float(length)
+            angle = float(angle)
+        except ValueError:
+            ErrorDialog("Ошибка", "Ошибка замеров", "Введены некорректные данные!")
+            return
+
+        # Init times list
+        times = []
+
+        # Get the time
+        for alg in [DDAAlgorithm, BresenhamFloatAlgorithm, BresenhamIntegerAlgorithm,
+                    BresenhamEliminationOfAliasingAlgorithm, WuAlgorithm, LibAlgorithm]:
+            all_time = 0
+
+            for _ in range(runs_count):
+                start_time = time()
+
+                cur_angle = 0
+
+                while cur_angle < 360:
+                    alg(center[0], center[1],
+                        center[0] + length * math.cos(math.radians(angle)),
+                        center[1] + length * math.sin(math.radians(angle)),
+                        line_color)
+
+                    cur_angle += angle
+
+                end_time = time()
+
+                all_time += end_time - start_time
+
+            times.append(all_time / runs_count)
+
+        # Draw the 2d diagrams for the times of the algorithms
+        plt.figure(figsize=(20, 20))
+        plt.title("Сравнение времени работы алгоритмов")
+        plt.xlabel("Алгоритм")
+        plt.ylabel("Время, с")
+        plt.bar(["ЦДА", "Брезенхем (float)", "Брезенхем (int)", "Брезенхем (сглаживание)", "Ву", "Библиотечный"],
+                times, color='green')
+
+        plt.show()
+
+    # Compare the stepping
+    def SteppingComparing(self):
+
+        # Get the lines color
+        line_color = GetLineColor(self)
+
+        # Get the background color
+        background_color = GetBackgroundColor(self)
+
+        # Set line color
+        self.paintWidget.setLineColor(QtGui.QColor(line_color[0], line_color[1], line_color[2]))
+
+        # Set background color
+        self.paintWidget.setBackgroundColor(QtGui.QColor(background_color[0], background_color[1], background_color[2]))
+
+        # Get the center
+        center = [self.CenterX.toPlainText(), self.CenterY.toPlainText()]
+
+        # Get the length
+        length = self.LenField.toPlainText()
+
+        # Check the input data
+        if center[0] == "" or center[1] == "" or length == "":
+            ErrorDialog("Ошибка", "Ошибка замеров", "Не все поля заполнены!")
+            return
+
+        try:
+            center[0] = int(center[0])
+            center[1] = int(center[1])
+            length = float(length)
+        except ValueError:
+            ErrorDialog("Ошибка", "Ошибка замеров", "Введены некорректные данные!")
+            return
+
+        # Init times list
+        steps = [[] for _ in range(5)]
+        angle_step = 2
+        cur_angle = 0
+
+        # Get the time
+
+        while cur_angle < 90:
+            for i, alg in enumerate([DDAAlgorithm, BresenhamFloatAlgorithm, BresenhamIntegerAlgorithm,
+                                     BresenhamEliminationOfAliasingAlgorithm, WuAlgorithm]):
+                cur_steps = alg(center[0], center[1],
+                                center[0] + length * math.cos(math.radians(cur_angle)),
+                                center[1] + length * math.sin(math.radians(cur_angle)),
+                                line_color, True)
+
+                steps[i].append(cur_steps)
+
+            cur_angle += angle_step
+
+        # Draw the 2d diagrams for the stepping of the algorithms
+        plt.figure(figsize=(20, 20))
+        plt.title("Сравнение ступенчатости алгоритмов при разных углах при длине отрезков: " + str(length))
+        plt.xlabel("Угол, градусы")
+        plt.ylabel("Количество ступенек")
+
+        plt.plot([i for i in range(0, 90, angle_step)], steps[0], label="ЦДА")
+        plt.plot([i for i in range(0, 90, angle_step)], steps[1], "--", label="Брезенхем (float)")
+        plt.plot([i for i in range(0, 90, angle_step)], steps[2], "-.", label="Брезенхем (int)")
+        plt.plot([i for i in range(0, 90, angle_step)], steps[3], "*", label="Брезенхем (сглаживание)")
+        plt.plot([i for i in range(0, 90, angle_step)], steps[4], ".", label="Ву")
+
+        plt.xticks([i for i in range(0, 91, angle_step)])
+        plt.legend()
+
+        plt.show()
+
     # Clear the graph
     def DeleteGraph(self):
 
@@ -272,7 +423,6 @@ class Window(QtWidgets.QMainWindow):
 
 
 if __name__ == "__main__":
-
     # Create the Qt Application
     app = QtWidgets.QApplication([])
     application = Window()

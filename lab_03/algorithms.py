@@ -18,7 +18,7 @@ def sign(x):
 
 
 # Digital Differential Analyzer Algorithm
-def DDAAlgorithm(x1, y1, x2, y2, color):
+def DDAAlgorithm(x1, y1, x2, y2, color, calculate_steps=False):
 
     # Calculate dx and dy
     dx = x2 - x1
@@ -41,21 +41,32 @@ def DDAAlgorithm(x1, y1, x2, y2, color):
     # Set the initial point
     x = x1
     y = y1
+    tmp_x = x
+    tmp_y = y
+    count_steps = 0
 
     # Create a list of points
     points = []
 
     # Calculate the points
     for i in range(int(steps)):
-        points.append([round(x), round(y), addingIntensity(color, 100)])
+        if calculate_steps:
+            tmp_x = x
+            tmp_y = y
+
         x += x_inc
         y += y_inc
 
-    return points
+        if not calculate_steps:
+            points.append([round(x), round(y), addingIntensity(color, 100)])
+        elif round(tmp_x) != round(x) and round(tmp_y) != round(y):
+            count_steps += 1
+
+    return points if not calculate_steps else count_steps
 
 
 # Bresenham float algorithm
-def BresenhamFloatAlgorithm(x1, y1, x2, y2, color):
+def BresenhamFloatAlgorithm(x1, y1, x2, y2, color, calculate_steps=False):
 
     # Calculate dx and dy
     dx = x2 - x1
@@ -89,13 +100,17 @@ def BresenhamFloatAlgorithm(x1, y1, x2, y2, color):
     # Set the initial point
     x = x1
     y = y1
+    tmp_x = x
+    tmp_y = y
+    count_steps = 0
 
     # Create a list of points
     points = []
 
     # Calculate the points
     for i in range(int(dx + 1)):
-        points.append([x, y, addingIntensity(color, 100)])
+        if not calculate_steps:
+            points.append([x, y, addingIntensity(color, 100)])
 
         if error >= 0:
             if exchange:
@@ -115,11 +130,18 @@ def BresenhamFloatAlgorithm(x1, y1, x2, y2, color):
         except ZeroDivisionError:
             error += dy / 1e-10
 
-    return points
+        if calculate_steps:
+            if tmp_x != x and tmp_y != y:
+                count_steps += 1
+
+            tmp_x = x
+            tmp_y = y
+
+    return points if not calculate_steps else count_steps
 
 
 # Bresenham integer algorithm
-def BresenhamIntegerAlgorithm(x1, y1, x2, y2, color):
+def BresenhamIntegerAlgorithm(x1, y1, x2, y2, color, calculate_steps=False):
 
     # Calculate dx and dy
     dx = x2 - x1
@@ -150,13 +172,17 @@ def BresenhamIntegerAlgorithm(x1, y1, x2, y2, color):
     # Set the initial point
     x = x1
     y = y1
+    tmp_x = x
+    tmp_y = y
+    count_steps = 0
 
     # Create a list of points
     points = []
 
     # Calculate the points
     for i in range(int(dx + 1)):
-        points.append([x, y, addingIntensity(color, 100)])
+        if not calculate_steps:
+            points.append([x, y, addingIntensity(color, 100)])
 
         if error >= 0:
             if exchange:
@@ -173,11 +199,18 @@ def BresenhamIntegerAlgorithm(x1, y1, x2, y2, color):
 
         error += 2 * dy
 
-    return points
+        if calculate_steps:
+            if tmp_x != x and tmp_y != y:
+                count_steps += 1
+
+            tmp_x = x
+            tmp_y = y
+
+    return points if not calculate_steps else count_steps
 
 
 # Bresenham's elimination of aliasing algorithm
-def BresenhamEliminationOfAliasingAlgorithm(x1, y1, x2, y2, color):
+def BresenhamEliminationOfAliasingAlgorithm(x1, y1, x2, y2, color, calculate_steps=False):
 
     # Calculate dx and dy
     dx = x2 - x1
@@ -214,13 +247,17 @@ def BresenhamEliminationOfAliasingAlgorithm(x1, y1, x2, y2, color):
     # Set the initial point
     x = x1
     y = y1
+    tmp_x = x
+    tmp_y = y
+    count_steps = 0
 
     # Create a list of points
     points = []
 
     # Calculate the points
     for i in range(int(dx + 1)):
-        points.append([x, y, addingIntensity(color, round(200 * error))])
+        if not calculate_steps:
+            points.append([x, y, addingIntensity(color, round(200 * error))])
 
         if error < (1 - error_inc):
             if not exchange:
@@ -234,11 +271,18 @@ def BresenhamEliminationOfAliasingAlgorithm(x1, y1, x2, y2, color):
             y += sy
             error -= (1 - error_inc)
 
-    return points
+        if calculate_steps:
+            if tmp_x != x and tmp_y != y:
+                count_steps += 1
+
+            tmp_x = x
+            tmp_y = y
+
+    return points if not calculate_steps else count_steps
 
 
 # Wu algorithm
-def WuAlgorithm(x1, y1, x2, y2, color):
+def WuAlgorithm(x1, y1, x2, y2, color, calculate_steps=False):
 
     # Calculate dx and dy
     dx = x2 - x1
@@ -256,6 +300,7 @@ def WuAlgorithm(x1, y1, x2, y2, color):
 
     # Create a list of points
     points = []
+    count_steps = 0
 
     if abs(dy) >= abs(dx):
         if dy != 0:
@@ -273,8 +318,11 @@ def WuAlgorithm(x1, y1, x2, y2, color):
             d1 = x1 - floor(x1)
             d2 = 1 - d1
 
-            points.append([int(x1) + 1, y, addingIntensity(color, round(fabs(d1) * 100))])
-            points.append([int(x1), y, addingIntensity(color, round(fabs(d2) * 100))])
+            if not calculate_steps:
+                points.append([int(x1) + 1, y, addingIntensity(color, round(fabs(d1) * 100))])
+                points.append([int(x1), y, addingIntensity(color, round(fabs(d2) * 100))])
+            elif y < round(y2) and int(x1) != int(x1 + intensity_coefficient):
+                count_steps += 1
 
             x1 += temp_intensity_coefficient
     else:
@@ -293,9 +341,18 @@ def WuAlgorithm(x1, y1, x2, y2, color):
             d1 = y1 - floor(y1)
             d2 = 1 - d1
 
-            points.append([x, int(y1) + 1, addingIntensity(color, round(fabs(d1) * 100))])
-            points.append([x, int(y1), addingIntensity(color, round(fabs(d2) * 100))])
+            if not calculate_steps:
+                points.append([x, int(y1) + 1, addingIntensity(color, round(fabs(d1) * 100))])
+                points.append([x, int(y1), addingIntensity(color, round(fabs(d2) * 100))])
+            elif x < round(x2) and int(y1) != int(y1 + intensity_coefficient):
+                count_steps += 1
 
             y1 += temp_intensity_coefficient
 
-    return points
+    return points if not calculate_steps else count_steps
+
+
+# Library algorithm
+def LibAlgorithm(x1, y1, x2, y2, color):
+    return [[round(x1), round(y1), addingIntensity(color, 100)],
+            [round(x2), round(y2), addingIntensity(color, 100)]]
