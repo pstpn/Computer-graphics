@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1532</width>
-    <height>898</height>
+    <height>914</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,40 +19,6 @@ color: rgb(243, 243, 243);
 font: 63 13pt &quot;URW Gothic&quot;;</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLabel" name="GraphField">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>110</y>
-      <width>900</width>
-      <height>720</height>
-     </rect>
-    </property>
-    <property name="minimumSize">
-     <size>
-      <width>0</width>
-      <height>0</height>
-     </size>
-    </property>
-    <property name="maximumSize">
-     <size>
-      <width>16777215</width>
-      <height>16777215</height>
-     </size>
-    </property>
-    <property name="acceptDrops">
-     <bool>false</bool>
-    </property>
-    <property name="toolTip">
-     <string/>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
    <widget class="QPushButton" name="ClearGraph">
     <property name="geometry">
      <rect>
@@ -74,9 +40,9 @@ font: 63 14pt &quot;URW Gothic&quot;;</string>
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>940</x>
+      <x>930</x>
       <y>10</y>
-      <width>561</width>
+      <width>271</width>
       <height>31</height>
      </rect>
     </property>
@@ -130,7 +96,7 @@ font: 63 14pt &quot;URW Gothic&quot;;</string>
      <rect>
       <x>930</x>
       <y>440</y>
-      <width>251</width>
+      <width>271</width>
       <height>41</height>
      </rect>
     </property>
@@ -146,9 +112,9 @@ font: 63 14pt &quot;URW Gothic&quot;;</string>
    <widget class="QPlainTextEdit" name="Y1Field">
     <property name="geometry">
      <rect>
-      <x>1260</x>
+      <x>1230</x>
       <y>440</y>
-      <width>251</width>
+      <width>281</width>
       <height>41</height>
      </rect>
     </property>
@@ -184,7 +150,7 @@ font: 63 14pt &quot;URW Gothic&quot;;</string>
      <rect>
       <x>930</x>
       <y>490</y>
-      <width>251</width>
+      <width>271</width>
       <height>41</height>
      </rect>
     </property>
@@ -200,9 +166,9 @@ font: 63 14pt &quot;URW Gothic&quot;;</string>
    <widget class="QPlainTextEdit" name="Y2Field">
     <property name="geometry">
      <rect>
-      <x>1260</x>
+      <x>1230</x>
       <y>490</y>
-      <width>251</width>
+      <width>281</width>
       <height>41</height>
      </rect>
     </property>
@@ -237,8 +203,8 @@ font: 63 14pt &quot;URW Gothic&quot;;</string>
     <property name="geometry">
      <rect>
       <x>930</x>
-      <y>660</y>
-      <width>251</width>
+      <y>700</y>
+      <width>271</width>
       <height>41</height>
      </rect>
     </property>
@@ -254,9 +220,9 @@ font: 63 14pt &quot;URW Gothic&quot;;</string>
    <widget class="QPlainTextEdit" name="LenField">
     <property name="geometry">
      <rect>
-      <x>1260</x>
-      <y>660</y>
-      <width>251</width>
+      <x>1230</x>
+      <y>700</y>
+      <width>281</width>
       <height>41</height>
      </rect>
     </property>
@@ -269,11 +235,11 @@ font: 63 14pt &quot;URW Gothic&quot;;</string>
      <string>Длина отрезка</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="DrawSpectr">
+   <widget class="QPushButton" name="DrawSpectrum">
     <property name="geometry">
      <rect>
       <x>930</x>
-      <y>710</y>
+      <y>750</y>
       <width>581</width>
       <height>51</height>
      </rect>
@@ -291,7 +257,7 @@ font: 63 14pt &quot;URW Gothic&quot;;</string>
     <property name="geometry">
      <rect>
       <x>930</x>
-      <y>780</y>
+      <y>810</y>
       <width>261</width>
       <height>51</height>
      </rect>
@@ -309,7 +275,7 @@ font: 63 14pt &quot;URW Gothic&quot;;</string>
     <property name="geometry">
      <rect>
       <x>1210</x>
-      <y>780</y>
+      <y>810</y>
       <width>301</width>
       <height>51</height>
      </rect>
@@ -327,9 +293,9 @@ font: 63 14pt &quot;URW Gothic&quot;;</string>
     <property name="geometry">
      <rect>
       <x>930</x>
-      <y>40</y>
-      <width>581</width>
-      <height>141</height>
+      <y>60</y>
+      <width>281</width>
+      <height>131</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="Colors">
@@ -431,6 +397,124 @@ font: 63 14pt &quot;URW Gothic&quot;;</string>
      </item>
     </layout>
    </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_3">
+    <property name="geometry">
+     <rect>
+      <x>1230</x>
+      <y>60</y>
+      <width>281</width>
+      <height>131</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="Colors_2">
+     <item row="0" column="0">
+      <widget class="QRadioButton" name="BlueColor_2">
+       <property name="text">
+        <string>Синий</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QRadioButton" name="PurpleColor_2">
+       <property name="text">
+        <string>Фиолетовый</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QRadioButton" name="RedColor_2">
+       <property name="text">
+        <string>Красный</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QRadioButton" name="WhiteColor_2">
+       <property name="text">
+        <string>Белый</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QRadioButton" name="GreenColor_2">
+       <property name="text">
+        <string>Зеленый</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QRadioButton" name="YellowColor_2">
+       <property name="text">
+        <string>Желтый</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>1230</x>
+      <y>10</y>
+      <width>281</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Цвет фона:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="GraphField" native="true">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>100</y>
+      <width>900</width>
+      <height>720</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="CenterX">
+    <property name="geometry">
+     <rect>
+      <x>930</x>
+      <y>650</y>
+      <width>271</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="placeholderText">
+     <string>X центра</string>
+    </property>
+   </widget>
+   <widget class="QPlainTextEdit" name="CenterY">
+    <property name="geometry">
+     <rect>
+      <x>1230</x>
+      <y>650</y>
+      <width>281</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(46, 52, 54);
+color: rgb(243, 243, 243);
+font: 63 14pt &quot;URW Gothic&quot;;</string>
+    </property>
+    <property name="placeholderText">
+     <string>Y центра</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -438,7 +522,7 @@ font: 63 14pt &quot;URW Gothic&quot;;</string>
      <x>0</x>
      <y>0</y>
      <width>1532</width>
-     <height>25</height>
+     <height>31</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_2">

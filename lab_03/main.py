@@ -1,7 +1,80 @@
-from PyQt5 import QtWidgets, QtGui, QtCore, uic
-from tools import ErrorDialog, PrintAuthorInfo, PrintTaskInfo, GetColor, GetAlgorithmPoints
+from PyQt5 import uic
+from tools import *
+import math
 
 import sys
+
+
+class PaintWidget(QtWidgets.QWidget):
+    def __init__(self, parent):
+
+        super().__init__(parent)
+
+        self.qp = QtGui.QPainter()
+
+        self.setFixedSize(900, 720)
+
+        self.lineColor = None
+        self.backgroundColor = None
+
+        self.setLineColor()
+        self.setBackgroundColor()
+
+        self.lines = []
+        self.spectra = []
+
+    def setLineColor(self, color=QtGui.QColor(0, 0, 0)):
+        self.lineColor = color
+
+    def setBackgroundColor(self, color=QtGui.QColor(255, 255, 255)):
+        self.backgroundColor = color
+
+    def paintEvent(self, event: QtGui.QPaintEvent):
+
+        self.qp.begin(self)
+
+        # Clear the field
+        self.qp.fillRect(0, 0, self.width(), self.height(), self.backgroundColor)
+
+        if self.lines:
+            for line in self.lines:
+                self.drawLine(line)
+
+        if self.spectra:
+            for spectrum in self.spectra:
+                self.drawSpectrum(spectrum)
+
+        self.qp.end()
+
+    def drawLine(self, points):
+
+        # Draw using library function
+        if points[-1]:
+            self.qp.setPen(QtGui.QPen(self.backgroundColor, 1))
+            self.qp.drawLine(int(points[0][0]), int(points[0][1]),
+                             int(points[1][0]), int(points[1][1]))
+            self.qp.setPen(QtGui.QPen(self.lineColor, 1))
+            self.qp.drawLine(int(points[0][0]), int(points[0][1]),
+                             int(points[1][0]), int(points[1][1]))
+        else:
+            for point in points[:-1]:
+                self.qp.setPen(QtGui.QPen(self.backgroundColor, 1))
+                self.qp.drawPoint(int(point[0]), int(point[1]))
+                color = GetQColor(point[2])
+                self.qp.setPen(QtGui.QPen(color, 1))
+                self.qp.drawPoint(int(point[0]), int(point[1]))
+
+    def drawSpectrum(self, spectra: list):
+
+        for line in spectra:
+            self.drawLine(line)
+
+    def clear(self):
+
+        self.lines = []
+        self.spectra = []
+
+        self.update()
 
 
 # Main window class
@@ -13,15 +86,36 @@ class Window(QtWidgets.QMainWindow):
         # Load the UI Interface
         uic.loadUi('Window/Window.ui', self)
 
-        # Set the main field
-        self.SetGraphField()
+        # Create a paint widget
+        self.paintWidget = PaintWidget(self.GraphField)
 
         # Set the radio buttons in layouts
         self.BlueColor.setChecked(True)
+        self.WhiteColor_2.setChecked(True)
         self.DDAAlg.setChecked(True)
+
+        # Set actions on lines color radio buttons
+        self.BlueColor.clicked.connect(self.SetLineColor)
+        self.GreenColor.clicked.connect(self.SetLineColor)
+        self.RedColor.clicked.connect(self.SetLineColor)
+        self.YellowColor.clicked.connect(self.SetLineColor)
+        self.WhiteColor.clicked.connect(self.SetLineColor)
+        self.PurpleColor.clicked.connect(self.SetLineColor)
+
+        # Set actions on background color radio buttons
+        self.BlueColor_2.clicked.connect(self.SetGraphFieldBackground)
+        self.GreenColor_2.clicked.connect(self.SetGraphFieldBackground)
+        self.RedColor_2.clicked.connect(self.SetGraphFieldBackground)
+        self.YellowColor_2.clicked.connect(self.SetGraphFieldBackground)
+        self.WhiteColor_2.clicked.connect(self.SetGraphFieldBackground)
+        self.PurpleColor_2.clicked.connect(self.SetGraphFieldBackground)
+
+        # Set the main field
+        self.SetGraphFieldBackground()
 
         # Set the buttons
         self.DrawLine.clicked.connect(self.DrawingLine)
+        self.DrawSpectrum.clicked.connect(self.DrawingSpectrum)
         self.ClearGraph.clicked.connect(self.DeleteGraph)
 
         self.AuthorInfo.triggered.connect(PrintAuthorInfo)
@@ -31,18 +125,49 @@ class Window(QtWidgets.QMainWindow):
         self.Quit.setShortcut("Ctrl+D")
         self.Quit.triggered.connect(QtWidgets.qApp.quit)
 
-    # Set the graph field
-    def SetGraphField(self):
+    # Set the line color
+    def SetLineColor(self):
 
-        canvas = QtGui.QPixmap(900, 720)
-        self.GraphField.setPixmap(canvas)
-        self.GraphField.pixmap().fill(QtCore.Qt.white)
+        # Get the line color
+        line_color = GetLineColor(self)
+
+        # Save color
+        self.paintWidget.lineColor = line_color
+
+        # Set the line color
+        self.paintWidget.setLineColor(QtGui.QColor(line_color[0], line_color[1], line_color[2]))
+
+    # Set the graph field background color
+    def SetGraphFieldBackground(self):
+
+        # Get the background color
+        background_color = GetBackgroundColor(self)
+
+        # Get Qt color
+        background_color = GetQColor(background_color)
+
+        # Save color
+        self.paintWidget.backgroundColor = background_color
+
+        # Set the background color
+        self.GraphField.setStyleSheet("background-color: rgb({}, {}, {});".format(background_color.getRgb()[0],
+                                                                                  background_color.getRgb()[1],
+                                                                                  background_color.getRgb()[2]))
 
     # Draw the line
     def DrawingLine(self):
 
-        # Get the color
-        color = GetColor(self)
+        # Get the lines color
+        line_color = GetLineColor(self)
+
+        # Get the background color
+        background_color = GetBackgroundColor(self)
+
+        # Set line color
+        self.paintWidget.setLineColor(QtGui.QColor(line_color[0], line_color[1], line_color[2]))
+
+        # Set background color
+        self.paintWidget.setBackgroundColor(QtGui.QColor(background_color[0], background_color[1], background_color[2]))
 
         # Get the input points
         first_point = [self.X1Field.toPlainText(), self.Y1Field.toPlainText()]
@@ -62,34 +187,87 @@ class Window(QtWidgets.QMainWindow):
             return
 
         # Get points
-        points = GetAlgorithmPoints(self,
-                                    first_point[0], first_point[1],
-                                    second_point[0], second_point[1],
-                                    color)
+        points, is_lib_alg = GetAlgorithmPoints(self,
+                                                first_point[0], first_point[1],
+                                                second_point[0], second_point[1],
+                                                line_color)
 
-        # Set the painter
-        painter = QtGui.QPainter(self.GraphField.pixmap())
-        pen = QtGui.QPen()
+        # Draw the points
+        points.append(is_lib_alg)
 
-        # Draw using library function
-        if len(points) == 0:
-            pen.setColor(QtGui.QColor(*color))
-            painter.setPen(pen)
-            painter.drawLine(int(first_point[0]), int(first_point[1]), int(second_point[0]), int(second_point[1]))
-        else:
-            for point in points:
-                pen.setColor(QtGui.QColor(*point[2]))
-                painter.setPen(pen)
-                painter.drawPoint(int(point[0]), int(point[1]))
+        # Add the line to the list
+        self.paintWidget.lines.append(points)
+        self.paintWidget.update()
 
-        # Update the field
-        self.GraphField.update()
-        painter.end()
+    # Draw the spectra
+    def DrawingSpectrum(self):
+
+        # Get the lines color
+        line_color = GetLineColor(self)
+
+        # Get the background color
+        background_color = GetBackgroundColor(self)
+
+        # Set line color
+        self.paintWidget.setLineColor(QtGui.QColor(line_color[0], line_color[1], line_color[2]))
+
+        # Set background color
+        self.paintWidget.setBackgroundColor(QtGui.QColor(background_color[0], background_color[1], background_color[2]))
+
+        # Get the center
+        center = [self.CenterX.toPlainText(), self.CenterY.toPlainText()]
+
+        # Get the length
+        length = self.LenField.toPlainText()
+
+        # Get the angle
+        angle = self.AngleField.toPlainText()
+
+        # Check the input data
+        if center[0] == "" or center[1] == "" or length == "" or angle == "":
+            ErrorDialog("Ошибка", "Ошибка ввода", "Не все поля заполнены!")
+            return
+        try:
+            center[0] = int(center[0])
+            center[1] = int(center[1])
+            length = float(length)
+            angle = float(angle)
+        except ValueError:
+            ErrorDialog("Ошибка", "Ошибка ввода", "Введены некорректные данные!")
+            return
+
+        # Init current angle and spectrum
+        current_angle = 0
+        current_spectrum = []
+
+        # Draw the spectra
+        while current_angle < 360:
+
+            # Get points
+            points, is_lib_alg = GetAlgorithmPoints(self,
+                                                    center[0], center[1],
+                                                    center[0] + length * math.cos(math.radians(current_angle)),
+                                                    center[1] + length * math.sin(math.radians(current_angle)),
+                                                    line_color)
+
+            # Draw the points
+            points.append(is_lib_alg)
+
+            current_spectrum.append(points)
+
+            # Update the angle
+            current_angle += angle
+
+        self.paintWidget.spectra.append(current_spectrum)
+        self.paintWidget.update()
 
     # Clear the graph
     def DeleteGraph(self):
 
-        self.GraphField.pixmap().fill(QtCore.Qt.white)
+        # Clear the graph
+        self.paintWidget.clear()
+
+        # Update the field
         self.GraphField.update()
 
 

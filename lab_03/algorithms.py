@@ -1,6 +1,11 @@
 from math import floor, fabs
 
 
+# Adding intensity
+def addingIntensity(color, intensity):
+    return color + (intensity, )
+
+
 # Get sign of number
 def sign(x):
 
@@ -21,7 +26,7 @@ def DDAAlgorithm(x1, y1, x2, y2, color):
 
     # If dx and dy are equal to zero, then the line is a point
     if dx == 0 and dy == 0:
-        return [[round(x1), round(y1), color]]
+        return [[round(x1), round(y1), addingIntensity(color, 100)]]
 
     # Calculate the number of steps
     if abs(dx) > abs(dy):
@@ -41,8 +46,8 @@ def DDAAlgorithm(x1, y1, x2, y2, color):
     points = []
 
     # Calculate the points
-    for i in range(steps):
-        points.append([round(x), round(y), color])
+    for i in range(int(steps)):
+        points.append([round(x), round(y), addingIntensity(color, 100)])
         x += x_inc
         y += y_inc
 
@@ -58,7 +63,7 @@ def BresenhamFloatAlgorithm(x1, y1, x2, y2, color):
 
     # If dx and dy are equal to zero, then the line is a point
     if dx == 0 and dy == 0:
-        return [[x1, y1, color]]
+        return [[x1, y1, addingIntensity(color, 100)]]
 
     # Get sign of dx and dy
     sx = sign(dx)
@@ -89,8 +94,8 @@ def BresenhamFloatAlgorithm(x1, y1, x2, y2, color):
     points = []
 
     # Calculate the points
-    for i in range(dx + 1):
-        points.append([x, y, color])
+    for i in range(int(dx + 1)):
+        points.append([x, y, addingIntensity(color, 100)])
 
         if error >= 0:
             if exchange:
@@ -122,7 +127,7 @@ def BresenhamIntegerAlgorithm(x1, y1, x2, y2, color):
 
     # If dx and dy are equal to zero, then the line is a point
     if dx == 0 and dy == 0:
-        return [[x1, y1, color]]
+        return [[x1, y1, addingIntensity(color, 100)]]
 
     # Get sign of dx and dy
     sx = sign(dx)
@@ -150,8 +155,8 @@ def BresenhamIntegerAlgorithm(x1, y1, x2, y2, color):
     points = []
 
     # Calculate the points
-    for i in range(dx + 1):
-        points.append([x, y, color])
+    for i in range(int(dx + 1)):
+        points.append([x, y, addingIntensity(color, 100)])
 
         if error >= 0:
             if exchange:
@@ -171,7 +176,7 @@ def BresenhamIntegerAlgorithm(x1, y1, x2, y2, color):
     return points
 
 
-# Bresenham elimination of aliasing algorithm
+# Bresenham's elimination of aliasing algorithm
 def BresenhamEliminationOfAliasingAlgorithm(x1, y1, x2, y2, color):
 
     # Calculate dx and dy
@@ -180,7 +185,7 @@ def BresenhamEliminationOfAliasingAlgorithm(x1, y1, x2, y2, color):
 
     # If dx and dy are equal to zero, then the line is a point
     if dx == 0 and dy == 0:
-        return [[x1, y1, color]]
+        return [[x1, y1, addingIntensity(color, 100)]]
 
     # Get sign of dx and dy
     sx = sign(dx)
@@ -214,10 +219,8 @@ def BresenhamEliminationOfAliasingAlgorithm(x1, y1, x2, y2, color):
     points = []
 
     # Calculate the points
-    for i in range(dx + 1):
-        points.append([x, y, (color[0] + round(255 * error) if color[0] + round(255 * error) < 255 else 255,
-                              color[1] + round(255 * error) if color[1] + round(255 * error) < 255 else 255,
-                              color[2] + round(255 * error) if color[2] + round(255 * error) < 255 else 255)])
+    for i in range(int(dx + 1)):
+        points.append([x, y, addingIntensity(color, round(200 * error))])
 
         if error < (1 - error_inc):
             if not exchange:
@@ -270,18 +273,8 @@ def WuAlgorithm(x1, y1, x2, y2, color):
             d1 = x1 - floor(x1)
             d2 = 1 - d1
 
-            points.append([int(x1) + 1, y, (color[0] + round(fabs(d2) * 255) if color[0] + round(fabs(d2) * 255) < 255
-                                            else 255,
-                                            color[1] + round(fabs(d2) * 255) if color[1] + round(fabs(d2) * 255) < 255
-                                            else 255,
-                                            color[2] + round(fabs(d2) * 255) if color[2] + round(fabs(d2) * 255) < 255
-                                            else 255)])
-            points.append([int(x1), y, (color[0] + round(fabs(d1) * 255) if color[0] + round(fabs(d1) * 255) < 255
-                                        else 255,
-                                        color[1] + round(fabs(d1) * 255) if color[1] + round(fabs(d1) * 255) < 255
-                                        else 255,
-                                        color[2] + round(fabs(d1) * 255) if color[2] + round(fabs(d1) * 255) < 255
-                                        else 255)])
+            points.append([int(x1) + 1, y, addingIntensity(color, round(fabs(d1) * 100))])
+            points.append([int(x1), y, addingIntensity(color, round(fabs(d2) * 100))])
 
             x1 += temp_intensity_coefficient
     else:
@@ -300,18 +293,8 @@ def WuAlgorithm(x1, y1, x2, y2, color):
             d1 = y1 - floor(y1)
             d2 = 1 - d1
 
-            points.append([x, int(y1) + 1, (color[0] + round(fabs(d2) * 255) if color[0] + round(fabs(d2) * 255) < 255
-                                            else 255,
-                                            color[1] + round(fabs(d2) * 255) if color[1] + round(fabs(d2) * 255) < 255
-                                            else 255,
-                                            color[2] + round(fabs(d2) * 255) if color[2] + round(fabs(d2) * 255) < 255
-                                            else 255)])
-            points.append([x, int(y1), (color[0] + round(fabs(d1) * 255) if color[0] + round(fabs(d1) * 255) < 255
-                                        else 255,
-                                        color[1] + round(fabs(d1) * 255) if color[1] + round(fabs(d1) * 255) < 255
-                                        else 255,
-                                        color[2] + round(fabs(d1) * 255) if color[2] + round(fabs(d1) * 255) < 255
-                                        else 255)])
+            points.append([x, int(y1) + 1, addingIntensity(color, round(fabs(d1) * 100))])
+            points.append([x, int(y1), addingIntensity(color, round(fabs(d2) * 100))])
 
             y1 += temp_intensity_coefficient
 
