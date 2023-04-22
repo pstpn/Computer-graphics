@@ -121,6 +121,11 @@ class Window(QtWidgets.QMainWindow):
             ErrorDialog("Ошибка", "Ошибка ввода", "Введены некорректные координаты!")
             return
 
+        first_point[0] = int(first_point[0])
+        first_point[1] = int(first_point[1])
+        second_point[0] = int(second_point[0])
+        second_point[1] = int(second_point[1])
+
         # Get points
         points, is_lib_alg = GetAlgorithmPoints(self,
                                                 first_point[0], first_point[1],
@@ -172,6 +177,9 @@ class Window(QtWidgets.QMainWindow):
             ErrorDialog("Ошибка", "Ошибка ввода", "Введены некорректные данные!")
             return
 
+        center[0] = int(center[0])
+        center[1] = int(center[1])
+
         # Init current angle and spectrum
         current_angle = 0
         current_spectrum = []
@@ -181,8 +189,8 @@ class Window(QtWidgets.QMainWindow):
             # Get points
             points, is_lib_alg = GetAlgorithmPoints(self,
                                                     center[0], center[1],
-                                                    center[0] + length * math.cos(math.radians(current_angle)),
-                                                    center[1] + length * math.sin(math.radians(current_angle)),
+                                                    int(center[0] + length * math.cos(math.radians(current_angle))),
+                                                    int(center[1] + length * math.sin(math.radians(current_angle))),
                                                     line_color)
 
             # Draw the points
@@ -234,6 +242,9 @@ class Window(QtWidgets.QMainWindow):
             ErrorDialog("Ошибка", "Ошибка замеров", "Введены некорректные данные!")
             return
 
+        center[0] = int(center[0])
+        center[1] = int(center[1])
+
         # Init times list
         times = []
 
@@ -249,8 +260,8 @@ class Window(QtWidgets.QMainWindow):
 
                 while cur_angle < 360:
                     alg(center[0], center[1],
-                        center[0] + length * math.cos(math.radians(angle)),
-                        center[1] + length * math.sin(math.radians(angle)),
+                        int(center[0] + length * math.cos(math.radians(angle))),
+                        int(center[1] + length * math.sin(math.radians(angle))),
                         line_color)
 
                     cur_angle += angle
@@ -305,6 +316,9 @@ class Window(QtWidgets.QMainWindow):
             ErrorDialog("Ошибка", "Ошибка замеров", "Введены некорректные данные!")
             return
 
+        center[0] = int(center[0])
+        center[1] = int(center[1])
+
         # Init times list
         steps = [[] for _ in range(5)]
         angle_step = 2
@@ -316,8 +330,8 @@ class Window(QtWidgets.QMainWindow):
             for i, alg in enumerate([DDAAlgorithm, BresenhamFloatAlgorithm, BresenhamIntegerAlgorithm,
                                      BresenhamEliminationOfAliasingAlgorithm, WuAlgorithm]):
                 cur_steps = alg(center[0], center[1],
-                                center[0] + length * math.cos(math.radians(cur_angle)),
-                                center[1] + length * math.sin(math.radians(cur_angle)),
+                                int(center[0] + length * math.cos(math.radians(cur_angle))),
+                                int(center[1] + length * math.sin(math.radians(cur_angle))),
                                 line_color, True)
 
                 steps[i].append(cur_steps)
@@ -352,6 +366,7 @@ class Window(QtWidgets.QMainWindow):
 
 
 if __name__ == "__main__":
+
     # Create the Qt Application
     app = QtWidgets.QApplication([])
     application = Window()

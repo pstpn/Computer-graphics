@@ -92,10 +92,7 @@ def BresenhamFloatAlgorithm(x1, y1, x2, y2, color, calculate_steps=False):
         exchange = False
 
     # Initialize the error
-    try:
-        error = dy / dx - 0.5
-    except ZeroDivisionError:
-        error = dy / 1e-10 - 0.5
+    error = dy / dx - 0.5
 
     # Set the initial point
     x = x1
@@ -125,10 +122,7 @@ def BresenhamFloatAlgorithm(x1, y1, x2, y2, color, calculate_steps=False):
         else:
             x += sx
 
-        try:
-            error += dy / dx
-        except ZeroDivisionError:
-            error += dy / 1e-10
+        error += dy / dx
 
         if calculate_steps:
             if tmp_x != x and tmp_y != y:
@@ -239,10 +233,7 @@ def BresenhamEliminationOfAliasingAlgorithm(x1, y1, x2, y2, color, calculate_ste
     error = 0.5
 
     # Initialize the error increment
-    try:
-        error_inc = dy / dx
-    except ZeroDivisionError:
-        error_inc = dy / 1e-10
+    error_inc = dy / dx
 
     # Set the initial point
     x = x1
