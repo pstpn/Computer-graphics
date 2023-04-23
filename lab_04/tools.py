@@ -62,7 +62,7 @@ def GetAlgorithmPoints(window, params, draw_figure=True):
             else MidpointEllipse(params, draw_figure)
     elif window.LibAlg.isChecked():
         return [[params[0], params[1], int(params[2]), int(params[2])]] if window.CircleBtn.isChecked() \
-            else [[params[0], params[1], int(params[3]), int(params[2])]]
+            else [[params[0], params[1], int(params[2]), int(params[3])]]
 
 
 

@@ -13,16 +13,16 @@ def AddSymPoints(x_c, y_c, x, y, figure: str):
 
     # If figure is circle add 4 points
     if figure == "Circle":
-        points.append([x, y])
-        points.append([x_c - delta_x, y])
-        points.append([x, y_c - delta_y])
-        points.append([x_c - delta_x, y_c - delta_y])
+        points.append([x_c - delta_y, y_c + delta_x])
+        points.append([x_c + delta_y, y_c + delta_x])
+        points.append([x_c + delta_y, y_c - delta_x])
+        points.append([x_c - delta_y, y_c - delta_x])
 
     # Add 4 symmetric points
-    points.append([x_c + delta_y, y_c + delta_x])
-    points.append([x_c - delta_y, y_c + delta_x])
-    points.append([x_c + delta_y, y_c - delta_x])
-    points.append([x_c - delta_y, y_c - delta_x])
+    points.append([x_c - delta_x, y_c + delta_y])
+    points.append([x_c + delta_x, y_c + delta_y])
+    points.append([x_c + delta_x, y_c - delta_y])
+    points.append([x_c - delta_x, y_c - delta_y])
 
     return points
 
@@ -94,9 +94,9 @@ def BresenhamCircle(params: list, draw=True):
     # Create points list
     points = []
     x = 0
-
-    # Get y and delta
     y = r
+
+    # Get delta
     delta = 2 * (1 - r)
 
     # Get points

@@ -7,6 +7,7 @@ from paint import PaintWidget
 import sys
 
 
+# Constants for measures
 runs_count = 300
 max_radius = 1200
 step = 100
@@ -468,7 +469,7 @@ class Window(QtWidgets.QMainWindow):
                 params = [0, 0, step*i] if self.CircleBtn.isChecked() else [0, 0, step*i, step*i]
                 for _ in range(runs_count):
                     start_t = time()
-                    alg(params)
+                    alg(params, False)
                     end_t = time()
                     all_time += end_t - start_t
 
@@ -476,6 +477,7 @@ class Window(QtWidgets.QMainWindow):
 
         radius = [i for i in range(step, max_radius, step)]
 
+        plt.figure(figsize=(13, 7))
         plt.rcParams['font.size'] = '15'
 
         plt.title(f"Замеры времени построения {'окружностей' if self.CircleBtn.isChecked() else 'эллипсов'}"
