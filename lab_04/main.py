@@ -10,7 +10,7 @@ import sys
 # Constants for measures
 runs_count = 300
 max_radius = 1200
-step = 100
+step = 50
 
 
 # Main window class

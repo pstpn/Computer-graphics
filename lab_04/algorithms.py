@@ -38,13 +38,14 @@ def CanonicalCircle(params: list, draw=True):
 
     # Get edge
     x = 0
+    r_sqr = r * r
     edge = round(r / sqrt(2))
 
     # Get points
     while x <= edge:
 
         # Get y
-        y = sqrt(r ** 2 - x ** 2)
+        y = sqrt(r_sqr - x ** 2)
 
         if draw:
             points += AddSymPoints(x_c, y_c, x + x_c, y + y_c, "Circle")
@@ -69,14 +70,16 @@ def ParametricCircle(params: list, draw=True):
 
     # Get angle
     alpha = 0
+    n = 0
 
     # Get points
-    while alpha <= pi / 4 + step:
+    while alpha <= pi / 4:
 
         x = round(r * cos(alpha))
         y = round(r * sin(alpha))
 
-        alpha += step
+        alpha = step * n
+        n += 1
 
         if draw:
             points += AddSymPoints(x_c, y_c, x + x_c, y + y_c, "Circle")
@@ -104,28 +107,10 @@ def BresenhamCircle(params: list, draw=True):
         if draw:
             points += AddSymPoints(x_c, y_c, x_c + x, y_c + y, "Circle")
 
-        if delta < 0:
-            d1 = 2 * delta + 2 * y - 1
-
-            if d1 < 0:
-                x += 1
-                delta += 2 * x + 1
-            else:
-                x += 1
-                y -= 1
-                delta += 2 * (x - y + 1)
-        elif delta > 0:
-            d2 = 2 * delta - 2 * x - 1
-
-            if d2 < 0:
-                x += 1
-                y -= 1
-                delta += 2 * (x - y + 1)
-            else:
-                y -= 1
-                delta -= 2 * y + 1
+        x += 1
+        if delta < 0 and 2 * delta + 2 * y - 1 < 0:
+            delta += 2 * x + 1
         else:
-            x += 1
             y -= 1
             delta += 2 * (x - y + 1)
 
@@ -145,7 +130,7 @@ def MidpointCircle(params: list, draw=True):
     y = r
 
     # Get delta
-    delta = 1 - r
+    delta = 5/4 - r
 
     # Get points
     while x <= y:
@@ -179,31 +164,30 @@ def CanonicalEllipse(params: list, draw=True):
     points = []
 
     # Get square of rx and ry
-    sqr_rx = rx ** 2
-    sqr_ry = ry ** 2
+    sqr_rx = rx * rx
+    sqr_ry = ry * ry
+    sqr = sqr_rx * sqr_ry
 
     # Get edges of ellipse
     edge_x = round(rx / sqrt(1 + sqr_ry / sqr_rx))
-    edge_y = round(ry / sqrt(1 + sqr_rx / sqr_ry))
 
     # Get points
     x = 0
     while x <= edge_x:
-        y = sqrt(sqr_rx * sqr_ry - x ** 2 * sqr_ry) / rx
+        y = round(sqrt(sqr - x * x * sqr_ry) / rx)
 
         if draw:
             points += AddSymPoints(x_c, y_c, x + x_c, y + y_c, "Ellipse")
 
         x += 1
 
-    y = 0
-    while y <= edge_y:
-        x = sqrt(sqr_rx * sqr_ry - y ** 2 * sqr_rx) / ry
+    while y >= 0:
+        x = round(sqrt(sqr - y * y * sqr_rx) / ry)
 
         if draw:
             points += AddSymPoints(x_c, y_c, x + x_c, y + y_c, "Ellipse")
 
-        y += 1
+        y -= 1
 
     if draw:
         return points
@@ -225,7 +209,7 @@ def ParametricEllipse(params: list, draw=True):
     alpha = 0
 
     # Get points
-    while alpha <= pi / 2 + step:
+    while alpha <= pi / 2:
 
         x = round(rx * cos(alpha))
         y = round(ry * sin(alpha))
@@ -251,8 +235,8 @@ def BresenhamEllipse(params: list, draw=True):
     x = 0
 
     # Get square of rx and ry
-    sqr_rx = rx ** 2
-    sqr_ry = ry ** 2
+    sqr_rx = rx * rx
+    sqr_ry = ry * ry
 
     # Get delta
     delta = sqr_ry - sqr_rx * (2 * ry + 1)
@@ -263,30 +247,26 @@ def BresenhamEllipse(params: list, draw=True):
         if draw:
             points += AddSymPoints(x_c, y_c, x + x_c, y + y_c, "Ellipse")
 
-        if delta < 0:
+        if delta <= 0:
             d1 = 2 * delta + sqr_rx * (2 * y + 2)
 
+            x += 1
+
             if d1 < 0:
-                x += 1
                 delta += sqr_ry * (2 * x + 1)
             else:
-                x += 1
                 y -= 1
                 delta += sqr_ry * (2 * x + 1) + sqr_rx * (1 - 2 * y)
-        elif delta > 0:
+        else:
             d2 = 2 * delta + sqr_ry * (2 - 2 * x)
+
+            y -= 1
 
             if d2 < 0:
                 x += 1
-                y -= 1
                 delta += sqr_ry * (2 * x + 1) + sqr_rx * (1 - 2 * y)
             else:
-                y -= 1
                 delta += sqr_rx * (1 - 2 * y)
-        else:
-            x += 1
-            y -= 1
-            delta += sqr_ry * (2 * x + 1) + sqr_rx * (1 - 2 * y)
 
     if draw:
         return points
@@ -304,8 +284,8 @@ def MidpointEllipse(params: list, draw=True):
     x = 0
 
     # Get square of rx and ry
-    sqr_rx = rx ** 2
-    sqr_ry = ry ** 2
+    sqr_rx = rx * rx
+    sqr_ry = ry * ry
 
     # Get edge and delta
     edge = round(rx / sqrt(1 + sqr_ry / sqr_rx))
